@@ -2,23 +2,23 @@ package main
 
 import "fmt"
 
-var current3 int = 0
-var current5 int = 0
-var current6 int = 0
+var current3 int64 = 0
+var current5 int64 = 0
+var current6 int64 = 0
 
-func triangle() int {
+func triangle() int64 {
 
 	current3++
 	return current3 * (current3 + 1) / 2
 }
 
-func pentagon() int {
+func pentagon() int64 {
 
 	current5++
 	return current5 * (3*current5 - 1) / 2
 }
 
-func hexagon() int {
+func hexagon() int64 {
 
 	current6++
 	return current6 * (2*current6 - 1)
@@ -26,11 +26,11 @@ func hexagon() int {
 
 func main() {
 
-	counter = 1
+	var counter int64 = 2
 
-	pent :=0
-	hex := 0
-	tri :=0
+	var pent int64 =0
+	var hex int64 =0
+	var tri int64 =0
 
 	for {
 
@@ -45,13 +45,13 @@ func main() {
 		}
 
 		if tri == pent && tri == hex {
-			fmt.Println(tri)
+			fmt.Println(tri,":",current3, current5, current6)
 			tri = triangle()
 		}
 		
 		if tri > counter {
-			fmt.Println("We're at ", counter)
-			counter *=2
+		//	fmt.Println("We're at", tri, "(triangle number ",current3,")")
+			counter = int64 (1.5* float64(counter))
 		}	
 		
 	}
