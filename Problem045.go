@@ -26,11 +26,14 @@ func hexagon() int {
 
 func main() {
 
+	counter = 1
+
 	pent :=0
 	hex := 0
 	tri :=0
 
 	for {
+
 		for pent < tri || pent < hex{
 			pent = pentagon()
 		}
@@ -45,6 +48,11 @@ func main() {
 			fmt.Println(tri)
 			tri = triangle()
 		}
+		
+		if tri > counter {
+			fmt.Println("We're at ", counter)
+			counter *=2
+		}	
+		
 	}
 }
-
