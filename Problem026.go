@@ -26,7 +26,7 @@ func main() {
 		newmerator := chomp(1, den, level)
 
 		answer := 0
-		for j := 1; newmerator != chomp(newmerator, den, j); j++ {
+		for j := 1; newmerator != chomp(newmerator, den, j); j++ {//this is pretty wasteful
 			answer = j + 1
 		}
 		if answer > record {
