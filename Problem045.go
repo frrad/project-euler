@@ -26,7 +26,7 @@ func hexagon() int64 {
 
 func main() {
 
-	var counter int64 = 2
+//	var counter int64 = 2
 
 	var pent int64 =0
 	var hex int64 =0
@@ -49,10 +49,10 @@ func main() {
 			tri = triangle()
 		}
 		
-		if tri > counter {
-		//	fmt.Println("We're at", tri, "(triangle number ",current3,")")
-			counter = int64 (1.5* float64(counter))
-		}	
+//		if tri > counter {
+//			fmt.Println("We're at", tri, "(triangle number ",current3,")")
+//			counter = int64 (2* float64(counter))
+//		}	
 		
 	}
 }
