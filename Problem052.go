@@ -36,8 +36,7 @@ func main() {
 			sortInt(3*i) == bench &&
 			sortInt(4*i) == bench &&
 			sortInt(5*i) == bench &&
-			sortInt(6*i) == bench 
-			{
+			sortInt(6*i) == bench {
 			fmt.Println(i)
 		}
 	}
