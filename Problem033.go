@@ -61,7 +61,26 @@ func isSame(a int, b int, c int, d int) bool {
 
 }
 
+func reduce(numerator int, denominator int) (num int, denom int) {
+	num = numerator
+	denom = denominator
+	for i := 2; i < num+1; i++ {
+		if num%i == 0 && denom%i == 0 {
+			num = num / i
+			denom = denom / i
+
+		}
+	}
+	if num == numerator {
+		return
+	}
+
+	return reduce(num, denom)
+}
+
 func main() {
+	numerator := 1
+	denominator := 1
 
 	for i := 10; i < 100; i++ {
 
@@ -69,11 +88,16 @@ func main() {
 
 			a, b := cancel(i, j)
 			if a != i && isSame(a, b, i, j) {
-				fmt.Println(a, b, i, j)
+				fmt.Println(a, "/", b, "=", i, "/", j)
+				numerator *= a
+				denominator *= b
 
 			}
 
 		}
 	}
-
+	fmt.Println("The product is:", numerator, "/", denominator)
+	numerator, denominator = reduce(numerator, denominator)
+	fmt.Println("Which reduces to ", numerator, "/", denominator)
+	fmt.Println("So the answer is", denominator)
 }
