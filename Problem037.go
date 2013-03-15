@@ -59,6 +59,7 @@ func main() {
 	for i := 10; i < 1000000; i++ {
 		if allPrime(i) && backAllPrime(i) {
 			total += i
+			//fmt.Println(i)
 		}
 	}
 	fmt.Println(total)
