@@ -70,8 +70,10 @@ func main() {
 		}
 	}
 
+	fmt.Print("\n{")
 	for _, i := range solutions {
-		fmt.Println(i)
+		fmt.Print(i, ",")
 	}
+	fmt.Print("0}\n")
 
 }
