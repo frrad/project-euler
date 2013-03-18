@@ -62,6 +62,41 @@ func IsPrime(n int64) bool {
 	return true
 }
 
+func ArePermutations(a int64, b int64) bool {
+	A := strconv.FormatInt(a, 10)
+	B := strconv.FormatInt(b, 10)
+
+	length := len(A)
+	list1 := make([]byte, length)
+	list2 := make([]byte, length)
+
+	if len(A) != len(B) {
+		return false
+	}
+
+	for i := 0; i < length; i++ {
+		list1[i] = A[i]
+		list2[i] = B[i]
+	}
+
+	for i := 0; i < length; i++ {
+		flag := false
+
+		for j := 0; j < length; j++ {
+			if flag == false && list1[i] == list2[j] {
+				list2[j] = 0
+				flag = true
+			}
+
+		}
+		if flag == false {
+			return false
+		}
+	}
+	return true
+
+}
+
 func Min(m int64, n int64) int64 {
 	if m < n {
 		return m
@@ -191,8 +226,4 @@ func StringSum(string1 string, string2 string) string {
 	answer = StringTrim(answer)
 
 	return answer
-}
-
-func StringProd(string1 string, string2 string) string {
-	return ""
 }
