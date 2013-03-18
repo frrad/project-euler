@@ -160,6 +160,27 @@ func StringReverse(a string) string {
 	return b
 }
 
+func IntReverse(n int64) int64 {
+	s := strconv.FormatInt(n, 10)
+	s = StringReverse(s)
+	x, _ := strconv.ParseInt(s, 10, 64)
+	return x
+}
+
+func IsPalindrome(n int64) bool {
+	if n == IntReverse(n) {
+		return true
+	}
+	return false
+}
+
+func IsStringPalindrome(n string) bool {
+	if n == StringReverse(n) {
+		return true
+	}
+	return false
+}
+
 //Removes 0-padding on Integer Strings
 func StringTrim(a string) string {
 	if a == "0" {
