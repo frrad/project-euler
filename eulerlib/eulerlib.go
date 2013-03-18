@@ -38,6 +38,41 @@ func Prime(n int64) int64 {
 	return i
 }
 
+//returns an ordered list of distinct factors
+func Factor(n int64) []int64 {
+	var answer = []int64{}
+
+	current := n
+
+	i := int64(1)
+	for !IsPrime(current) {
+		if current%Prime(i) == 0 {
+			answer = append(answer, Prime(i))
+			current = current / Prime(i)
+			i = 0
+		}
+		i++
+	}
+
+	answer = append(answer, current)
+
+	return answer
+}
+
+//Number of distinct members of a sorted list
+func DistinctNumber(list []int64) int {
+	current := list[0]
+	total := 1
+	for i := 1; i < len(list); i++ {
+		if current != list[i] {
+			total++
+		}
+		current = list[i]
+	}
+	return total
+
+}
+
 func IsPrime(n int64) bool {
 
 	end := int64(math.Sqrt(float64(n)))
