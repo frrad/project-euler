@@ -3,6 +3,7 @@ package eulerlib
 import (
 	"math"
 	"strconv"
+	"strings"
 )
 
 const (
@@ -12,6 +13,46 @@ const (
 )
 
 var primeTable [primeTableLength]int64
+
+func BubbleSort(word string) string {
+	wordtable := strings.Split(word, "")
+	for j := 0; j < len(word); j++ {
+
+		for i := 0; i < len(word)-1; i++ {
+			if wordtable[i] < wordtable[i+1] {
+				temp := wordtable[i]
+				wordtable[i] = wordtable[i+1]
+				wordtable[i+1] = temp
+			}
+		}
+	}
+	return strings.Join(wordtable, "")
+}
+
+func SortInt(input int64) int64 {
+
+	swapped, _ := strconv.ParseInt(BubbleSort(strconv.FormatInt(input, 10)), 10, 64)
+
+	return swapped
+
+}
+
+func IsPandigital(n int64) bool {
+
+	height := 1 + int64(math.Log10(float64(n)))
+
+	output := int64(0)
+
+	for i := int64(1); i < height+1; i++ {
+		current := int64(1)
+		for j := int64(1); j < i; j++ {
+			current *= 10
+		}
+		output += (current * (i - 1))
+	}
+
+	return output == SortInt(n)
+}
 
 func Prime(n int64) int64 {
 
