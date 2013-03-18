@@ -59,6 +59,26 @@ func Factor(n int64) []int64 {
 	return answer
 }
 
+func Exp2(n int) int64 {
+	answer := int64(1)
+	for i := 0; i < n; i++ {
+		answer *= 2
+	}
+	return answer
+}
+
+func XOR(a byte, b byte) (answer byte) {
+	first := a
+	second := b
+	for i := 0; i < 8; i++ {
+		answer += byte(Exp2(i)) * ((first%2 + second%2) % 2)
+		first = (first - first%2) / 2
+		second = (second - second%2) / 2
+	}
+
+	return answer
+}
+
 //Number of distinct members of a sorted list
 func DistinctNumber(list []int64) int {
 	current := list[0]
