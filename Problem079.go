@@ -7,7 +7,7 @@ import (
 	"time"
 )
 
-const mergesame = .5
+const mergesame = 1 //Could be <1 a priori
 
 func works(key string, secret string) bool {
 	a := -1
@@ -92,7 +92,7 @@ func main() {
 
 	eulerlib.BubbleSortVec(keys)
 
-	keys = keys[:eulerlib.RemoveDuplicatesVec(keys, true)]
+	keys = eulerlib.RemoveDuplicatesVec(keys)
 
 	best := 100
 
