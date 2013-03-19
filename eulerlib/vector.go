@@ -31,22 +31,17 @@ func CutVec(a []string, i int, j int) {
 	a = a[:len(a)-j-1+i]
 }
 
-//removes duplicate entries in a vector.
-//flag indicates if input is sorted
-func RemoveDuplicatesVec(input []string, flag bool) int {
-	if flag {
-		for i := 0; i < len(input)-1; i++ {
-			if input[i] == input[i+1] {
-				CutVec(input, i+1, i+1)
-				//fmt.Println(input, len(input))
-				return RemoveDuplicatesVec(input[:len(input)-1], true)
+//removes duplicate entries in a SORTED vector.
+func RemoveDuplicatesVec(input []string) []string {
 
-			}
-
-		}
-		return len(input)
-
+	if len(input) == 1 {
+		return input
 	}
 
-	return 0
+	if input[0] == input[1] {
+		return RemoveDuplicatesVec(append(input[1:]))
+	}
+
+	return append(input[:1], RemoveDuplicatesVec(input[1:])...)
+
 }
