@@ -1,11 +1,11 @@
 package main
 
 import (
-	"./eulerlib"
+	"./euler"
 	"fmt"
 )
 
 func main() {
-	fmt.Println("Hello, World", eulerlib.Prime(10000))
+	fmt.Println("Hello, World", euler.Prime(10000))
 
 }

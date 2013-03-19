@@ -1,4 +1,4 @@
-package eulerlib
+package euler
 
 import (
 	"io/ioutil"
