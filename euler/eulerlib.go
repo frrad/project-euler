@@ -276,3 +276,21 @@ func IsStringPalindrome(n string) bool {
 	}
 	return false
 }
+
+func IntExp(a int64, b int64) int64 {
+	if b == 0 {
+		return 1
+	}
+	if b == 1 {
+		return a
+	}
+	if b%2 == 0 {
+		temp := IntExp(a, b/2)
+		return temp * temp
+	}
+	return a * IntExp(a, b-1)
+}
+
+func NumberDigits(n int64) int {
+	return (len(strconv.FormatInt(n, 10)))
+}
