@@ -1,6 +1,7 @@
 package main
 
 import (
+	//	"./euler"
 	"fmt"
 	"math"
 )
@@ -33,9 +34,9 @@ func main() {
 	max := int64(0)
 	fmt.Print("\n{")
 
-	for i := int64(1); i < 1000000; i++ {
+	for i := int64(1); ; i++ {
 		if naive(i) > max {
-			fmt.Print("{", i, ",", naive(i), "},")
+			fmt.Print("{", i, ",", i, "},")
 			max = naive(i)
 		}
 	}
