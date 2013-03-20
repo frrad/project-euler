@@ -1,17 +1,18 @@
 package main
 
 import (
-	"./eulerlib"
+	"./euler"
 	"fmt"
+	"strconv"
 )
 
-func ctdFrac(list []int64) (num int64, den int64) {
-	num = list[len(list)-1]
-	den = 1
+func ctdFrac(list []int) (num string, den string) {
+	num = strconv.Itoa(list[len(list)-1])
+	den = "1"
 
 	for i := len(list) - 2; i >= 0; i-- {
 
-		num, den = eulerlib.FracReduce(eulerlib.FracAdd(list[i], 1, den, num))
+		num, den = euler.StringFastFracAdd(strconv.Itoa(list[i]), "1", den, num)
 
 		fmt.Println(num, den)
 	}
@@ -19,15 +20,8 @@ func ctdFrac(list []int64) (num int64, den int64) {
 	return
 }
 
-func min(a int64, b int64) int64 {
-	if a < b {
-		return a
-	}
-	return b
-}
-
-func eList(n int) []int64 {
-	answer := make([]int64, n)
+func eList(n int) []int {
+	answer := make([]int, n)
 
 	answer[0] = 2
 
@@ -35,8 +29,8 @@ func eList(n int) []int64 {
 		answer[i] = 1
 	}
 
-	for i := int64(0); 3*i+2 < int64(n); i++ {
-		answer[3*i+2] = int64(2) * (i + int64(1))
+	for i := 0; 3*i+2 < n; i++ {
+		answer[3*i+2] = 2 * (i + 1)
 
 	}
 
@@ -45,9 +39,9 @@ func eList(n int) []int64 {
 
 func main() {
 
-	fmt.Println(eulerlib.StringSum("0", "2345654322"))
+	fmt.Println(euler.StringSum("0", "2345654322"))
 
-	numerator, _ := ctdFrac(eList(30))
-	fmt.Println(eulerlib.DigitSum(numerator))
+	numerator, _ := ctdFrac(eList(100))
+	fmt.Println(euler.StringDigitSum(numerator))
 
 }

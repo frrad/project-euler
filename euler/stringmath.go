@@ -8,6 +8,14 @@ func StringFastFracAdd(num1 string, den1 string, num2 string, den2 string) (stri
 	return StringSum(StringProd(num1, den2), StringProd(num2, den1)), StringProd(den1, den2)
 }
 
+func StringDigitSum(str string) (total int) {
+	for i := 0; i < len(str); i++ {
+		is, _ := strconv.Atoi(str[i : i+1])
+		total += is
+	}
+	return
+}
+
 func StringSum(string1 string, string2 string) string {
 	length1 := int64(len(string1))
 	length2 := int64(len(string2))
