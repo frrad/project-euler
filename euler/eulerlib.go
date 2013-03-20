@@ -16,6 +16,13 @@ const (
 var primeTable [primeTableLength]int64
 var totientTable [totientTableLength]int64
 
+func ConcatanInt(a int64, b int64) int64 {
+
+	//wrong string conversion
+	x, _ := strconv.Atoi(strconv.FormatInt(a, 10) + strconv.FormatInt(b, 10))
+	return int64(x)
+}
+
 func Totient(n int64) int64 {
 	if n < 2 {
 		return 0
