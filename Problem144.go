@@ -23,7 +23,7 @@ func normal(x float64, y float64) float64 {
 
 func reflect(n float64, m float64) float64 {
 
-	return (2*n + m*(-1+(n*n))) / (1 + (2 * m * n) - (n * n))
+	return (2*n - m*(1-(n*n))) / (1 + (2 * m * n) - (n * n))
 }
 
 func findB(x float64, y float64, m float64) float64 {
@@ -36,33 +36,29 @@ func main() {
 	b := 10.1
 
 	x, y := getR(m, b)
-	fmt.Println("{", x, ",", y, "}, ")
+	//fmt.Println("{", x, ",", y, "}, ")
 
 	count := 0
-	for (math.Abs(x) > .01 || y < 0) && count < 20 {
+	for math.Abs(x) > .01 || y < 0 {
 
 		m = reflect(normal(x, y), m)
 
 		b = findB(x, y, m)
 
-		x, y = getL(m, b)
-		fmt.Println("{", x, ",", y, "}, ")
+		l, _ := getL(m, b)
+		r, _ := getR(m, b)
 
-		m = reflect(normal(x, y), m)
-
-		b = findB(x, y, m)
-
-		x, y = getR(m, b)
-
-		fmt.Println("{", x, ",", y, "}, ")
-
-		count += 2
-
-		if count%1000 == 0 {
-			fmt.Println("{", x, ",", y, "}, ", count, "\n")
-
+		if math.Abs(l-x) > math.Abs(r-x) {
+			x, y = getL(m, b)
+		} else {
+			x, y = getR(m, b)
 		}
-	}
-	fmt.Println("{", x, ",", y, "}, ", count, "\n")
 
+		//fmt.Println("{", x, ",", y, "}, ")
+
+		count++
+
+	}
+
+	fmt.Println(count)
 }
