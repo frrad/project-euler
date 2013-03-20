@@ -9,10 +9,42 @@ import (
 const (
 	primeTableLength = 100000000
 	//lastPrime = Prime[primeTableLength - 1]
-	lastPrime = 2038074739
+	lastPrime          = 2038074739
+	totientTableLength = 1000000
 )
 
 var primeTable [primeTableLength]int64
+var totientTable [totientTableLength]int64
+
+func Totient(n int64) int64 {
+	if n < 2 {
+		return 0
+	}
+	if n < totientTableLength && totientTable[n] != 0 {
+		return totientTable[n]
+	}
+
+	factors := Factor(n)
+
+	if factors[0] == factors[len(factors)-1] {
+		answer := IntExp(factors[0], int64(len(factors))) - IntExp(factors[0], int64(len(factors)-1))
+		totientTable[n] = answer
+		return answer
+	}
+
+	for i := 0; i < len(factors); i++ {
+		if factors[i] != factors[0] {
+			split := IntExp(factors[0], int64(i))
+			answer := Totient(split) * Totient(n/split)
+			totientTable[n] = answer
+			return answer
+		}
+	}
+
+	//bad things have happenned if we're here
+	return 0
+
+}
 
 func BubbleSort(word string) string {
 	wordtable := strings.Split(word, "")
