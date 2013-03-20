@@ -200,18 +200,35 @@ func Min(m int64, n int64) int64 {
 	return n
 }
 
-func GCD(n int64, m int64) int64 {
-
-	top := Min(m, n)
-
-	for i := int64(1); Prime(i) <= top; i++ {
-		if n%Prime(i) == 0 && m%Prime(i) == 0 {
-			return Prime(i) * GCD(n/Prime(i), m/Prime(i))
-		}
+func Max(m int64, n int64) int64 {
+	if m < n {
+		return n
 	}
-	return 1
+	return m
 }
 
+//Euclid's Algorithm 
+//(Recursive implementation eats memory)
+func GCD(n int64, m int64) int64 {
+
+	max := Max(m, n)
+	min := Min(m, n)
+
+	for min != max {
+		min = Min(min, max-min)
+		max = Max(min, max-min)
+	}
+
+	return min
+
+}
+
+//Adds fractions quickly, may unreduce
+func FastFracAdd(num1 int64, den1 int64, num2 int64, den2 int64) (num int64, den int64) {
+	return num1*den2 + num2*den1, den1 * den2
+}
+
+//Given two reduced fractions, returns their reduced sum
 func FracAdd(num1 int64, den1 int64, num2 int64, den2 int64) (num int64, den int64) {
 	gcd := GCD(den1, den2)
 	d1 := den1 / gcd
@@ -239,13 +256,6 @@ func DigitSum(N int64) (sum int) {
 		sum += x
 	}
 	return
-}
-
-func Max(a int64, b int64) int64 {
-	if a > b {
-		return a
-	}
-	return b
 }
 
 func StringReverse(a string) string {
