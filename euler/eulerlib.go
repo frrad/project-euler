@@ -23,6 +23,21 @@ func ConcatanInt(a int64, b int64) int64 {
 	return int64(x)
 }
 
+//removes duplicate entries in a SORTED vector.
+func RemoveDuplicates(input []int64) []int64 {
+
+	if len(input) == 1 {
+		return input
+	}
+
+	if input[0] == input[1] {
+		return RemoveDuplicates(append(input[1:]))
+	}
+
+	return append(input[:1], RemoveDuplicates(input[1:])...)
+
+}
+
 func Totient(n int64) int64 {
 	if n < 2 {
 		return 0
