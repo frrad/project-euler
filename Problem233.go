@@ -1,12 +1,12 @@
 package main
 
 import (
-	//	"./euler"
+	"./euler"
 	"fmt"
 	"math"
 )
 
-const threshold = .000000000001
+const threshold = .0000000000001
 
 func solveBottom(x float64, n float64) float64 {
 	return (1.0 / 2.0) * (n - math.Sqrt((n*n)+(4*n*x)-(4*x*x)))
@@ -29,17 +29,58 @@ func naive(n int64) int64 {
 	return total * 4
 }
 
+func isPythagorean(p int64) bool {
+	return (p-1)%4 == 0
+}
+
+//4 more than 8 times the number of pythagorean primes
+//contained in the prime factorization
+func smart(n int64) int64 {
+	factors := euler.Factor(n)
+	total := int64(0)
+
+	last := int64(0)
+
+	distinct := int64(0)
+	dupes := int64(0)
+
+	for _, factor := range factors {
+		if isPythagorean(factor) {
+			total++
+
+			if last == factor {
+				dupes++
+			} else {
+				distinct++
+			}
+
+			last = factor
+
+		}
+
+	}
+
+	answer := 8 * total * distinct
+	if distinct > 1 {
+		answer += 8 * dupes
+	}
+	return answer
+
+}
+
 func main() {
 
-	max := int64(0)
-	fmt.Print("\n{")
+	badnumber := 0
 
-	for i := int64(1); ; i++ {
-		if naive(i) > max {
-			fmt.Print("{", i, ",", i, "},")
-			max = naive(i)
+	for i := int64(1); i < 10000; i++ {
+
+		if naive(i)-smart(i)-4 != 0 {
+			fmt.Println(i, naive(i)-4, smart(i), euler.Factor(i))
+
+			badnumber++
 		}
 	}
-	fmt.Print("\b}\n")
+
+	fmt.Println(badnumber)
 
 }
