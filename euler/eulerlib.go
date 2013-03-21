@@ -23,6 +23,11 @@ func ConcatanInt(a int64, b int64) int64 {
 	return int64(x)
 }
 
+//unnecessarily slow. short though!
+func IsSquare(x int64) bool {
+	return int64(math.Sqrt(float64(x)))*int64(math.Sqrt(float64(x))) == x
+}
+
 //removes duplicate entries in a SORTED vector.
 func RemoveDuplicates(input []int64) []int64 {
 

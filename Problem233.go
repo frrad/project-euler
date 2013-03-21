@@ -1,8 +1,10 @@
 package main
 
 import (
+	"./euler"
 	"fmt"
 	"math"
+	"strconv"
 	"time"
 )
 
@@ -25,13 +27,13 @@ func naive(n int64) int64 {
 	return total * 4
 }
 
+//number of pythagorean triples with "C"=n
 func better(n int64) int64 {
 
 	count := int64(0)
 	for i := int64(0); i < n; i++ {
 		a2 := n*n - i*i
-		a := int64(math.Sqrt(float64(a2)))
-		if a2 == a*a {
+		if euler.IsSquare(a2) {
 			count++
 		}
 	}
@@ -41,19 +43,31 @@ func better(n int64) int64 {
 
 func main() {
 
-	start := time.Now()
+	starttime := time.Now()
 
-	top := int64(0)
-	for i := int64(0); i < 10000; i++ {
+	//We're looking for numbers of the form 2^k * \prod pi * q1 * q2^2 * q3^3
+	//for pi,qi prime and p_1 % 4 = 3 and qi%4 = 1. Start by populating tables
+	primes1 := make([]string, 0) //Table of pythagorean primes
+	primes3 := make([]string, 0) //Primes which are 3 mod 4
 
-		if better(i) > top {
-			fmt.Println(better(i))
-			top = better(i)
+	for i := int64(0); i < 350000; i++ {
+		num := euler.Prime(i)
+		prime := strconv.FormatInt(num, 10)
 
+		if num%4 == 1 {
+			primes1 = append(primes1, prime)
+
+		} else {
+			primes3 = append(primes3, prime)
 		}
+	}
+
+	for i := 0; i < count; i++ {
 
 	}
 
-	fmt.Println("Elapsed time:", time.Since(start))
+	fmt.Println(primes1, primes3)
+
+	fmt.Println("Elapsed time:", time.Since(starttime))
 
 }
