@@ -23,7 +23,10 @@ func Import(filename string) []string {
 			currentline += string(char)
 		}
 	}
-	output = append(output, currentline)
+
+	if currentline != "" {
+		output = append(output, currentline)
+	}
 
 	return output
 
