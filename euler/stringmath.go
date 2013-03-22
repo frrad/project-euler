@@ -128,6 +128,20 @@ func StringProd(x string, y string) (product string) {
 	return
 }
 
+func StringExp(a string, b int64) string {
+	if b == 0 {
+		return "1"
+	}
+	if b == 1 {
+		return a
+	}
+	if b%2 == 0 {
+		temp := StringExp(a, b/2)
+		return StringProd(temp, temp)
+	}
+	return StringProd(a, StringExp(a, b-1))
+}
+
 //Removes 0-padding on Integer Strings
 func StringTrim(a string) string {
 	if a == "0" {
