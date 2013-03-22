@@ -3,43 +3,9 @@ package main
 import (
 	"./euler"
 	"fmt"
-	"math"
 	"strconv"
 	"time"
 )
-
-const threshold = .0000000001
-
-func solveBottom(x float64, n float64) float64 {
-	return (1.0 / 2.0) * (n - math.Sqrt((n*n)+(4*n*x)-(4*x*x)))
-}
-
-func naive(n int64) int64 {
-	total := int64(0)
-	N := float64(n)
-	for x := math.Ceil(N / 2); x < N/2+(N*math.Sqrt(2)/2); x++ {
-		y := solveBottom(x, N)
-		yround := float64(int(y))
-		if math.Abs(y-yround) < threshold {
-			total++
-		}
-	}
-	return total * 4
-}
-
-//number of pythagorean triples with "C"=n
-func better(n int64) int64 {
-
-	count := int64(0)
-	for i := int64(0); i < n; i++ {
-		a2 := n*n - i*i
-		if euler.IsSquare(a2) {
-			count++
-		}
-	}
-	return 4 * count
-
-}
 
 func isSmall(str string) bool {
 	if len(str) > 11 {
@@ -47,7 +13,6 @@ func isSmall(str string) bool {
 	}
 	return true
 }
-
 func isMultiple(n int64) bool { //returns true if there are no pythagorean prime factors
 	for _, factor := range euler.Factor(n) {
 		if factor%4 == 1 {
@@ -56,47 +21,32 @@ func isMultiple(n int64) bool { //returns true if there are no pythagorean prime
 	}
 	return true
 }
-
 func lastSmall(table []string, multiple string) int {
 	min := 0
 	max := len(table)
 	for max-min > 1 {
-
 		if isSmall(euler.StringProd(multiple, table[(min+max)/2])) {
 			min = (min + max) / 2
 		} else {
 			max = (min + max) / 2
 		}
-
 	}
 	return min
 }
-
 func main() {
-
-	fmt.Println(isSmall("99999999999"), isSmall("100000000000"))
-
 	starttime := time.Now()
 
-	//We're looking for numbers of the form 2^k * \prod pi * q1 * q2^2 * q3^3
-	//for pi,qi prime and pi % 4 = 3 and qi % 4 = 1. Start by populating table
 	primes1 := make([]string, 0) //Table of pythagorean primes
-
-	for i := int64(1); i < 350000; i++ {
+	for i := int64(1); i < 333000; i++ {
 		num := euler.Prime(i)
-		prime := strconv.FormatInt(num, 10)
-
 		if num%4 == 1 {
-			primes1 = append(primes1, prime)
-
+			primes1 = append(primes1, strconv.FormatInt(num, 10))
 		}
 	}
 
 	multitable := make([]string, 1) //numbers of the form 2^k \prod pi
 	multitable[0] = "1"
-
 	for i := int64(1); i < 280000; i++ {
-
 		if isMultiple(i) {
 			multitable = append(multitable, strconv.FormatInt(i, 10))
 		}
@@ -108,97 +58,66 @@ func main() {
 		sumtable[i] = euler.StringSum(sumtable[i-1], multitable[i])
 	}
 
-	fmt.Println("Tables written")
-
 	total := "0"
-	pentagon := "0"
-	counttttt, dice := 0, 0
 
-	for two := 0; isSmall(pentagon); two++ { //Index of q2
-
-		pentagon = euler.StringExp(primes1[two], 10)
-
-		hex := pentagon
-		for one := 0; isSmall(hex); one++ { //Index of q3
-			if one == two {
-				one++
+	//primes of the form p1^p2*10^2 for pi distinct, pythagorean
+	prime1 := ""
+	for index1 := 0; isSmall(prime1); index1++ {
+		prime1 = euler.StringExp(primes1[index1], 10)
+		product := prime1
+		for index2 := 0; isSmall(product); index2++ {
+			if index2 == index1 {
+				index2++
 			}
-
-			hex = euler.StringProd(pentagon, euler.StringExp(primes1[one], 2))
-
-			if isSmall(hex) {
-				dice := lastSmall(multitable, hex)
-				contribution := euler.StringProd(hex, sumtable[dice])
-				counttttt += (dice + 1)
+			product = euler.StringProd(prime1, euler.StringExp(primes1[index2], 2))
+			if isSmall(product) {
+				contribution := euler.StringProd(product, sumtable[lastSmall(multitable, product)])
 				total = euler.StringSum(total, contribution)
-
 			}
-
-		}
-	}
-	fmt.Println(counttttt)
-
-	fmt.Println(total)
-
-	pentagon = "0"
-	for two := 0; isSmall(pentagon); two++ { //Index of q2
-
-		pentagon = euler.StringExp(primes1[two], 7)
-
-		hex := pentagon
-		for one := 0; isSmall(hex); one++ { //Index of q3
-			if one == two {
-				one++
-			}
-
-			hex = euler.StringProd(pentagon, euler.StringExp(primes1[one], 3))
-
-			if isSmall(hex) {
-				dice = lastSmall(multitable, hex)
-				contribution := euler.StringProd(hex, sumtable[dice])
-				total = euler.StringSum(total, contribution)
-				counttttt += (dice + 1)
-
-			}
-
 		}
 	}
 
-	fmt.Println(total)
-
-	cube := "0"
-
-	for three := 0; isSmall(cube); three++ { //Index of q3
-		cube = euler.StringExp(primes1[three], 3)
-		fmt.Println(cube)
-		pentagon := cube
-		for two := 0; isSmall(pentagon); two++ { //Index of q2
-			if two == three {
-				two++
+	//primes of the form p1^7*p2^3 for pi distinct, pythagorean
+	prime1 = ""
+	for index1 := 0; isSmall(prime1); index1++ {
+		prime1 = euler.StringExp(primes1[index1], 7)
+		product := prime1
+		for index2 := 0; isSmall(product); index2++ {
+			if index2 == index1 {
+				index2++
 			}
-			pentagon = euler.StringProd(cube, euler.StringExp(primes1[two], 2))
+			product = euler.StringProd(prime1, euler.StringExp(primes1[index2], 3))
+			if isSmall(product) {
+				contribution := euler.StringProd(product, sumtable[lastSmall(multitable, product)])
+				total = euler.StringSum(total, contribution)
+			}
+		}
+	}
 
-			hex := pentagon
-			for one := 0; isSmall(hex); one++ { //Index of q3
-				for three == one || one == two {
-					one++
+	//primes of the form p1^3*p2^2*p3 for pi distinct, pythagorean
+	prime1 = ""
+	for index1 := 0; isSmall(prime1); index1++ { //Index of q3
+		prime1 = euler.StringExp(primes1[index1], 3)
+		product1 := prime1
+		for index2 := 0; isSmall(product1); index2++ { //Index of q2
+			if index2 == index1 {
+				index2++
+			}
+			product1 = euler.StringProd(prime1, euler.StringExp(primes1[index2], 2))
+			finalproduct := product1
+			for index3 := 0; isSmall(finalproduct); index3++ { //Index of q3
+				for index1 == index3 || index3 == index2 {
+					index3++
 				}
-				hex = euler.StringProd(pentagon, primes1[one])
-				if isSmall(hex) {
-					dice = lastSmall(multitable, hex)
-					contribution := euler.StringProd(hex, sumtable[dice])
-					counttttt += dice + 1
+				finalproduct = euler.StringProd(product1, primes1[index3])
+				if isSmall(finalproduct) {
+					contribution := euler.StringProd(finalproduct, sumtable[lastSmall(multitable, finalproduct)])
 					total = euler.StringSum(total, contribution)
-
 				}
-
 			}
 		}
-
 	}
 
-	fmt.Println(total, counttttt)
-
+	fmt.Println(total)
 	fmt.Println("Elapsed time:", time.Since(starttime))
-
 }
