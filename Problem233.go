@@ -42,7 +42,10 @@ func better(n int64) int64 {
 }
 
 func isSmall(str string) bool {
-	return len(str) < 11
+	if len(str) > 11 {
+		return false
+	}
+	return true
 }
 
 func isMultiple(n int64) bool { //returns true if there are no pythagorean prime factors
@@ -71,6 +74,8 @@ func lastSmall(table []string, multiple string) int {
 
 func main() {
 
+	fmt.Println(isSmall("99999999999"), isSmall("100000000000"))
+
 	starttime := time.Now()
 
 	//We're looking for numbers of the form 2^k * \prod pi * q1 * q2^2 * q3^3
@@ -90,7 +95,7 @@ func main() {
 	multitable := make([]string, 1) //numbers of the form 2^k \prod pi
 	multitable[0] = "1"
 
-	for i := int64(1); i < 30000; i++ {
+	for i := int64(1); i < 280000; i++ {
 
 		if isMultiple(i) {
 			multitable = append(multitable, strconv.FormatInt(i, 10))
@@ -108,6 +113,7 @@ func main() {
 	total := "0"
 	pentagon := "0"
 	counttttt, dice := 0, 0
+
 	for two := 0; isSmall(pentagon); two++ { //Index of q2
 
 		pentagon = euler.StringExp(primes1[two], 10)
@@ -164,7 +170,7 @@ func main() {
 
 	for three := 0; isSmall(cube); three++ { //Index of q3
 		cube = euler.StringExp(primes1[three], 3)
-
+		fmt.Println(cube)
 		pentagon := cube
 		for two := 0; isSmall(pentagon); two++ { //Index of q2
 			if two == three {
