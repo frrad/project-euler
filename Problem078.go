@@ -6,71 +6,92 @@ import (
 	"time"
 )
 
-const tablesize = 100000000
+const (
+	tablesize = 10000000
+	mod       = 1000000
+)
 
-var table [tablesize]*big.Int
+var table [tablesize]int
 
 //Recurrence equation for partition function, due to Euler
-func P(n int) *big.Int {
-	if n < tablesize && table[n] != nil {
-		return table[int(n)]
+func P(n int) int {
+	if n == 0 {
+		return 1
 	}
-	if n <= 0 {
-		fmt.Println("ERRORR")
-		return nil
+	if n < 0 {
+		return 0
 	}
-	sum := big.NewInt(0)
+
+	if n < tablesize && table[n] != 0 {
+		return table[n]
+	}
+
+	sum := 0
+
 	for k := 1; k <= n; k++ {
+		var summand int
 		if k%2 == 0 {
-			if n-(k*(3*k-1)/2) < 0 && n-(k*(3*k+1)/2) < 0 {
-				//do nothing
-			} else if n-(k*(3*k-1)/2) < 0 && n-(k*(3*k+1)/2) >= 0 {
-				sum.Sub(sum, P(n-(k*(3*k+1)/2)))
-			} else if n-(k*(3*k-1)/2) >= 0 && n-(k*(3*k+1)/2) < 0 {
-				sum.Sub(sum, P(n-(k*(3*k-1)/2)))
-			} else {
-				sum.Sub(sum, P(n-(k*(3*k-1)/2)))
-				sum.Sub(sum, P(n-(k*(3*k+1)/2)))
-			}
+			summand = -1
 		} else {
-			if n-(k*(3*k-1)/2) < 0 && n-(k*(3*k+1)/2) < 0 {
-				//do nothing
-			} else if n-(k*(3*k-1)/2) < 0 && n-(k*(3*k+1)/2) >= 0 {
-				sum.Add(sum, P(n-(k*(3*k+1)/2)))
-			} else if n-(k*(3*k-1)/2) >= 0 && n-(k*(3*k+1)/2) < 0 {
-				sum.Add(sum, P(n-(k*(3*k-1)/2)))
-			} else {
-				sum.Add(sum, P(n-(k*(3*k-1)/2)))
-				sum.Add(sum, P(n-(k*(3*k+1)/2)))
-			}
+			summand = 1
 		}
+
+		summand *= P(f(n, k)) + P(g(n, k))
+
+		sum += summand
 	}
+
 	if n < tablesize {
-		table[int(n)] = sum
+		table[n] = (sum + 10*mod) % mod
 	}
-	return sum
+
+	return (sum + mod) % mod
+}
+
+func f(n, k int) int {
+	N := big.NewInt(int64(n))
+	K := big.NewInt(int64(k))
+
+	a, b, c, d, e := new(big.Int), new(big.Int), new(big.Int), new(big.Int), new(big.Int)
+
+	a.Mul(K, big.NewInt(3))
+	b.Sub(a, big.NewInt(1))
+	c.Mul(b, K)
+	d.Div(c, big.NewInt(2))
+	e.Sub(N, d)
+
+	return int(e.Int64())
+
+}
+
+func g(n, k int) int {
+	N := big.NewInt(int64(n))
+	K := big.NewInt(int64(k))
+
+	a, b, c, d, e := new(big.Int), new(big.Int), new(big.Int), new(big.Int), new(big.Int)
+
+	a.Mul(K, big.NewInt(3))
+	b.Add(a, big.NewInt(1))
+	c.Mul(b, K)
+	d.Div(c, big.NewInt(2))
+	e.Sub(N, d)
+
+	return int(e.Int64())
+
 }
 
 func main() {
 	starttime := time.Now()
+	i := 2
 
-	table[0] = big.NewInt(1)
-
-	i := 1
-
-	mod := new(big.Int)
-	million := big.NewInt(1000000)
-	zero := big.NewInt(0)
-
-	for mod.Mod(P(i), million).Cmp(zero) != 0 {
+	for P(i) != 0 {
 
 		fmt.Println(i, P(i))
-
-		i += 1
+		i++
 
 	}
 
-	fmt.Println(i, P(i))
+	fmt.Println(P(i))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 
