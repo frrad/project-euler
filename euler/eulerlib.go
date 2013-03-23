@@ -55,7 +55,9 @@ func Totient(n int64) int64 {
 
 	if factors[0] == factors[len(factors)-1] {
 		answer := IntExp(factors[0], int64(len(factors))) - IntExp(factors[0], int64(len(factors)-1))
-		totientTable[n] = answer
+		if n < totientTableLength {
+			totientTable[n] = answer
+		}
 		return answer
 	}
 
@@ -63,7 +65,9 @@ func Totient(n int64) int64 {
 		if factors[i] != factors[0] {
 			split := IntExp(factors[0], int64(i))
 			answer := Totient(split) * Totient(n/split)
-			totientTable[n] = answer
+			if n < totientTableLength {
+				totientTable[n] = answer
+			}
 			return answer
 		}
 	}
