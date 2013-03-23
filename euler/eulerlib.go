@@ -10,7 +10,7 @@ const (
 	primeTableLength = 100000000
 	//lastPrime = Prime[primeTableLength - 1]
 	lastPrime          = 2038074739
-	totientTableLength = 1000000
+	totientTableLength = 10000000
 )
 
 var primeTable [primeTableLength]int64
