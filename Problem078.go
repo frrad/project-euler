@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"math/big"
 	"time"
 )
 
@@ -49,35 +48,12 @@ func P(n int) int {
 }
 
 func f(n, k int) int {
-	N := big.NewInt(int64(n))
-	K := big.NewInt(int64(k))
 
-	a, b, c, d, e := new(big.Int), new(big.Int), new(big.Int), new(big.Int), new(big.Int)
-
-	a.Mul(K, big.NewInt(3))
-	b.Sub(a, big.NewInt(1))
-	c.Mul(b, K)
-	d.Div(c, big.NewInt(2))
-	e.Sub(N, d)
-
-	return int(e.Int64())
-
+	return n - (k * (3*k - 1) / 2)
 }
 
 func g(n, k int) int {
-	N := big.NewInt(int64(n))
-	K := big.NewInt(int64(k))
-
-	a, b, c, d, e := new(big.Int), new(big.Int), new(big.Int), new(big.Int), new(big.Int)
-
-	a.Mul(K, big.NewInt(3))
-	b.Add(a, big.NewInt(1))
-	c.Mul(b, K)
-	d.Div(c, big.NewInt(2))
-	e.Sub(N, d)
-
-	return int(e.Int64())
-
+	return n - (k * (3*k + 1) / 2)
 }
 
 func main() {
