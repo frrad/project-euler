@@ -28,7 +28,7 @@ func P(n int) int {
 
 	sum := 0
 
-	for k := 1; k <= n; k++ {
+	for k := 1; k <= n && (f(n, k) >= 0 || g(n, k) >= 0); k++ {
 		var summand int
 		if k%2 == 0 {
 			summand = -1
@@ -82,16 +82,17 @@ func g(n, k int) int {
 
 func main() {
 	starttime := time.Now()
+
 	i := 2
 
+	answer := 0
+
 	for P(i) != 0 {
-
-		fmt.Println(i, P(i))
 		i++
-
+		answer = i
 	}
 
-	fmt.Println(P(i))
+	fmt.Println(answer)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 
