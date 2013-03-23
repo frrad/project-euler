@@ -88,6 +88,21 @@ func BubbleSort(word string) string {
 	return strings.Join(wordtable, "")
 }
 
+func BubbleSortInts(list []int) []int {
+
+	for j := 0; j < len(list); j++ {
+
+		for i := 0; i < len(list)-1; i++ {
+			if list[i] < list[i+1] {
+				temp := list[i]
+				list[i] = list[i+1]
+				list[i+1] = temp
+			}
+		}
+	}
+	return list
+}
+
 func SortInt(input int64) int64 {
 
 	swapped, _ := strconv.ParseInt(BubbleSort(strconv.FormatInt(input, 10)), 10, 64)
