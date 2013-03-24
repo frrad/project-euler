@@ -31,12 +31,10 @@ func main() {
 
 	solution := int64(0)
 
-	for i := int64(1000000000); !fitsMask(i * i); i++ {
+	for i := int64(1000000000); !fitsMask(i * i); i += 10 {
 
-		solution = i + 1
-		if i%100000 == 0 {
-			fmt.Println(i)
-		}
+		solution = i + 10
+
 	}
 	fmt.Println(solution, solution*solution)
 
