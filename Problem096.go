@@ -272,6 +272,58 @@ func (puz *puzzle) isBroken() bool {
 
 }
 
+//finds a good guess 
+func (puz *puzzle) guess() (int, int, int) {
+	winning := 9
+	for i := 0; i < 9; i++ {
+		for j := 0; j < 9; j++ {
+
+			if puz.grid[i][j] == 0 {
+
+				sum := 0
+				for k := 0; k < 9; k++ {
+					if puz.inference[i][j][k] {
+						sum++
+					}
+				}
+				if sum < winning {
+					winning = sum
+				}
+			}
+
+		}
+	}
+
+	for i := 0; i < 9; i++ {
+		for j := 0; j < 9; j++ {
+
+			if puz.grid[i][j] == 0 {
+
+				sum := 0
+				for k := 0; k < 9; k++ {
+					if puz.inference[i][j][k] {
+						sum++
+					}
+				}
+				if sum == winning {
+					k := rand.Int() % 9
+
+					for !puz.inference[i][j][k] {
+						k = rand.Int() % 9
+
+					}
+
+					return i, j, k
+				}
+			}
+
+		}
+	}
+
+	return 0, 0, 0
+
+}
+
 func solve(puz *puzzle) bool {
 	puz.initInfer()
 
@@ -306,14 +358,7 @@ func solve(puz *puzzle) bool {
 	for !clone.isComplete() && exhaustion < 5 {
 
 		//find a guess to make
-		a := rand.Int() % 9
-		b := rand.Int() % 9
-		c := rand.Int() % 9
-		for clone.grid[a][b] != 0 || !puz.inference[a][b][c] {
-			a = rand.Int() % 9
-			b = rand.Int() % 9
-			c = rand.Int() % 9
-		}
+		a, b, c := puz.guess()
 
 		clone.grid[a][b] = c + 1
 
@@ -343,6 +388,8 @@ func solve(puz *puzzle) bool {
 func main() {
 	starttime := time.Now()
 
+	answer := 0
+
 	data := euler.Import("problemdata/sudoku.txt")
 
 	for offset := 1; offset < 500; offset += 10 {
@@ -358,15 +405,19 @@ func main() {
 
 		puz := puzzle{grid: grid}
 
-		fmt.Println("solving...")
+		fmt.Println("Puzzle", ((offset-1)/10)+1)
+
 		puz.print()
 		for !solve(&puz) {
 		}
 
-		fmt.Println("Puzzle", ((offset-1)/10)+1)
 		puz.print()
 
+		answer += puz.grid[0][0]*100 + puz.grid[0][1]*10 + puz.grid[0][2]
+
 	}
+
+	fmt.Println(answer)
 	fmt.Println("Elapsed time:", time.Since(starttime))
 
 }
