@@ -32,7 +32,6 @@ func (puz *puzzle) print() {
 		}
 		fmt.Print("\n")
 	}
-	fmt.Print("\n")
 
 }
 
@@ -275,6 +274,8 @@ func (puz *puzzle) isBroken() bool {
 
 func solve(puz *puzzle) bool {
 	puz.initInfer()
+
+	//This is hacky, should replace with a check for changes in inference
 	stuck := 0
 	for !puz.isComplete() && !puz.isBroken() && stuck < 1000 {
 		puz.inferStraight()
@@ -293,9 +294,16 @@ func solve(puz *puzzle) bool {
 	}
 
 	//if we have neither completed nor broken the puzzle, we guess
-	clone := puzzle{grid: puz.grid}
+	clonegrid := make([][]int, 9)
+	for i := 0; i < 9; i++ {
+		clonegrid[i] = make([]int, 9)
+		copy(clonegrid[i], puz.grid[i])
+
+	}
+	clone := puzzle{grid: clonegrid}
+
 	exhaustion := 0
-	for !clone.isComplete()) && exhaustion < 200 {
+	for !clone.isComplete() && exhaustion < 5 {
 
 		//find a guess to make
 		a := rand.Int() % 9
@@ -308,19 +316,22 @@ func solve(puz *puzzle) bool {
 		}
 
 		clone.grid[a][b] = c + 1
-		fmt.Println("guessing:")
-		clone.print()
 
-		if !solve(&clone) || clone.isBroken() {
-			clone = puzzle{grid: puz.grid}
-			clone.initInfer()
+		if !solve(&clone) {
+
+			clonegrid = make([][]int, 9)
+			for i := 0; i < 9; i++ {
+				clonegrid[i] = make([]int, 9)
+				copy(clonegrid[i], puz.grid[i])
+
+			}
+			clone = puzzle{grid: clonegrid}
 		}
 
 		exhaustion++
 	}
-	if exhaustion == 200 {
+	if exhaustion > 2 {
 		return false
-		fmt.Println("I'm exhausted")
 	}
 
 	puz.grid = clone.grid
@@ -349,13 +360,11 @@ func main() {
 
 		fmt.Println("solving...")
 		puz.print()
-		if !solve(&puz) {
-			panic("BROKEN")
+		for !solve(&puz) {
 		}
 
 		fmt.Println("Puzzle", ((offset-1)/10)+1)
 		puz.print()
-		fmt.Println(puz.isBroken())
 
 	}
 	fmt.Println("Elapsed time:", time.Since(starttime))
