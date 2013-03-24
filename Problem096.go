@@ -275,6 +275,7 @@ func (puz *puzzle) isBroken() bool {
 //finds a good guess 
 func (puz *puzzle) guess() (int, int, int) {
 	winning := 9
+	righti, rightj := 0, 0
 	for i := 0; i < 9; i++ {
 		for j := 0; j < 9; j++ {
 
@@ -288,37 +289,21 @@ func (puz *puzzle) guess() (int, int, int) {
 				}
 				if sum < winning {
 					winning = sum
+					righti, rightj = i, j
 				}
 			}
 
 		}
 	}
 
-	for i := 0; i < 9; i++ {
-		for j := 0; j < 9; j++ {
+	k := rand.Int() % 9
 
-			if puz.grid[i][j] == 0 {
+	for !puz.inference[righti][rightj][k] {
+		k = rand.Int() % 9
 
-				sum := 0
-				for k := 0; k < 9; k++ {
-					if puz.inference[i][j][k] {
-						sum++
-					}
-				}
-				if sum == winning {
-					k := rand.Int() % 9
-
-					for !puz.inference[i][j][k] {
-						k = rand.Int() % 9
-
-					}
-
-					return i, j, k
-				}
-			}
-
-		}
 	}
+
+	return righti, rightj, k
 
 	return 0, 0, 0
 
@@ -327,14 +312,36 @@ func (puz *puzzle) guess() (int, int, int) {
 func solve(puz *puzzle) bool {
 	puz.initInfer()
 
-	//This is hacky, should replace with a check for changes in inference
-	stuck := 0
-	for !puz.isComplete() && !puz.isBroken() && stuck < 1000 {
+	state := make([][][]bool, 9)
+	for i := 0; i < 9; i++ {
+		state[i] = make([][]bool, 9)
+		for j := 0; j < 9; j++ {
+			state[i][j] = make([]bool, 9)
+		}
+	}
+	flag := true
+
+	for !puz.isComplete() && !puz.isBroken() && flag {
 		puz.inferStraight()
 		puz.inferSquares()
 
+		flag = false
+		for i := 0; i < 9; i++ {
+			for j := 0; j < 9; j++ {
+				for k := 0; k < 9; k++ {
+					if state[i][j][k] != puz.inference[i][j][k] {
+						flag = true
+					}
+				}
+			}
+		}
+		for i := 0; i < 9; i++ {
+			for j := 0; j < 9; j++ {
+				copy(state[i][j], puz.inference[i][j])
+			}
+		}
+
 		puz.deduce()
-		stuck++
 	}
 
 	if puz.isBroken() {
@@ -405,13 +412,13 @@ func main() {
 
 		puz := puzzle{grid: grid}
 
-		fmt.Println("Puzzle", ((offset-1)/10)+1)
+		//	fmt.Println("Puzzle", ((offset-1)/10)+1)
 
-		puz.print()
+		//	puz.print()
 		for !solve(&puz) {
 		}
 
-		puz.print()
+		//	puz.print()
 
 		answer += puz.grid[0][0]*100 + puz.grid[0][1]*10 + puz.grid[0][2]
 
