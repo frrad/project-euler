@@ -8,6 +8,15 @@ import (
 	"time"
 )
 
+const infinity = 999999
+
+func sign(n int) int {
+	if n < 0 {
+		return -1
+	}
+	return 1
+}
+
 func main() {
 	starttime := time.Now()
 
@@ -24,12 +33,44 @@ func main() {
 		matrix[j] = row
 	}
 
-	matrix = make([][]int, 5)
-	matrix[0] = []int{131, 673, 234, 103, 18}
-	matrix[1] = []int{201, 96, 342, 965, 150}
-	matrix[2] = []int{630, 803, 746, 422, 111}
-	matrix[3] = []int{537, 699, 497, 121, 956}
-	matrix[4] = []int{805, 732, 524, 37, 331}
+	sumtrix := make([][]int, len(matrix))
+	for i := range sumtrix {
+		sumtrix[i] = make([]int, len(matrix[0]))
+		sumtrix[i][0] = matrix[i][0]
+	}
+
+	for currentColumn := 1; currentColumn < len(matrix[0]); currentColumn++ {
+
+		for i := 0; i < len(matrix); i++ {
+			winner := infinity
+			for j := 0; j < len(matrix); j++ {
+				//now we compute the cost of getting to (i, column) from (j, column -1)
+				cost := matrix[i][currentColumn]
+				cost += sumtrix[j][currentColumn-1]
+				for k := i; sign(j-i)*(j-k) > 0; k += sign(j - i) {
+					cost += matrix[k][currentColumn-1]
+				}
+
+				if cost < winner {
+					winner = cost
+				}
+
+			}
+
+			sumtrix[i][currentColumn] = winner
+
+		}
+	}
+
+	best := infinity
+
+	for i := 0; i < len(sumtrix); i++ {
+		if sumtrix[i][len(sumtrix[i])-1] < best {
+			best = sumtrix[i][len(sumtrix[i])-1]
+		}
+	}
+
+	fmt.Println(best)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 
