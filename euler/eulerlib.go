@@ -305,6 +305,18 @@ func Max(m int64, n int64) int64 {
 //Euclid's Algorithm 
 //(Recursive implementation eats memory)
 func GCD(n int64, m int64) int64 {
+	if n == 0 {
+		return m
+	}
+	if m == 0 {
+		return m
+	}
+	if m < 0 {
+		m = -m
+	}
+	if n < 0 {
+		n = -n
+	}
 
 	max := Max(m, n)
 	min := Min(m, n)
