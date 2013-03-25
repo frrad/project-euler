@@ -3,7 +3,6 @@ package main
 import (
 	"./euler"
 	"fmt"
-	"math/rand"
 	"strconv"
 	"time"
 )
@@ -273,7 +272,7 @@ func (puz *puzzle) isBroken() bool {
 }
 
 //finds a good guess 
-func (puz *puzzle) guess() (int, int, int) {
+func (puz *puzzle) guess() func() (int, int, int) {
 	winning := 9
 	righti, rightj := 0, 0
 	for i := 0; i < 9; i++ {
@@ -296,16 +295,20 @@ func (puz *puzzle) guess() (int, int, int) {
 		}
 	}
 
-	k := rand.Int() % 9
+	k := -1
 
-	for !puz.inference[righti][rightj][k] {
-		k = rand.Int() % 9
+	return func() (int, int, int) {
+
+		k++
+
+		for k < 9 && !puz.inference[righti][rightj][k] {
+			k++
+
+		}
+
+		return righti, rightj, k
 
 	}
-
-	return righti, rightj, k
-
-	return 0, 0, 0
 
 }
 
@@ -361,11 +364,9 @@ func solve(puz *puzzle) bool {
 	}
 	clone := puzzle{grid: clonegrid}
 
-	exhaustion := 0
-	for !clone.isComplete() && exhaustion < 5 {
-
-		//find a guess to make
-		a, b, c := puz.guess()
+	guesser := puz.guess()
+	a, b, c := guesser()
+	for !clone.isComplete() && c != 9 {
 
 		clone.grid[a][b] = c + 1
 
@@ -378,12 +379,15 @@ func solve(puz *puzzle) bool {
 
 			}
 			clone = puzzle{grid: clonegrid}
+
+			a, b, c = guesser()
 		}
 
-		exhaustion++
 	}
-	if exhaustion > 2 {
+	if c == 9 {
+
 		return false
+
 	}
 
 	puz.grid = clone.grid
