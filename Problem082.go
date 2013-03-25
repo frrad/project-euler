@@ -20,7 +20,7 @@ func sign(n int) int {
 func main() {
 	starttime := time.Now()
 
-	data := euler.Import("problemdata/matrix82.txt")
+	data := euler.Import("problemdata/matrix.txt")
 
 	matrix := make([][]int, len(data))
 
