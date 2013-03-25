@@ -143,7 +143,7 @@ func IsPandigital(n int64) bool {
 		for j := int64(1); j < i; j++ {
 			current *= 10
 		}
-		output += (current * (i - 1))
+		output += (current * (i))
 	}
 
 	return output == SortInt(n)
