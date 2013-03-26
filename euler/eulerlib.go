@@ -168,6 +168,8 @@ func Prime(n int64) int64 {
 		i++
 	}
 
+	primepilist[i] = n
+
 	if n < primeTableLength {
 		primeTable[n] = i
 	}
