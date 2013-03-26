@@ -52,32 +52,20 @@ func (ring *ngon) rep() int64 {
 	return solution
 }
 
-func (ring *ngon) is16() bool {
-
-	for i := 0; i < n; i++ {
-		if ring.inner[i] == 10 {
-			return false
-		}
-	}
-
-	return true
-
-}
-
 func main() {
 	starttime := time.Now()
 
 	winner := int64(0)
 
-	for i := 0; i < 3628800; i++ {
+	for i := 0; i < 362880; i++ {
 
-		permutation := euler.Permutation(i, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
+		permutation := euler.Permutation(i, []int{1, 2, 3, 4, 5, 6, 7, 8, 9})
 
 		test := ngon{
 			inner: [5]int{permutation[0], permutation[1], permutation[2], permutation[3], permutation[4]},
-			outer: [5]int{permutation[5], permutation[6], permutation[7], permutation[8], permutation[9]}}
+			outer: [5]int{permutation[5], permutation[6], permutation[7], permutation[8], 10}}
 
-		if test.sum() && test.is16() {
+		if test.sum() {
 			if test.rep() > winner {
 				winner = test.rep()
 			}
