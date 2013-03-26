@@ -231,6 +231,10 @@ func DistinctNumber(list []int64) int {
 
 func IsPrime(n int64) bool {
 
+	if n == 1 {
+		return false
+	}
+
 	end := int64(math.Sqrt(float64(n)))
 
 	//If we start computing beyond the table, this is stupid
