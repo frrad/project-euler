@@ -12,37 +12,37 @@ type setup struct {
 	bottom int
 }
 
-var table = make(map[setup]int)
+var table = make(map[setup]int64)
 
-func ways(input setup) int {
+func ways(input setup) int64 {
 	if answer, ok := table[input]; ok {
 		return answer
 	}
 
 	bin := trim(input.binary)
-	answer := 0
+	answer := int64(0)
 
 	if lookup, ok := table[setup{bin, input.top, input.bottom}]; ok {
 		answer = lookup
+	} else if input.top > len(bin)-1 || input.bottom > len(bin)-1 || input.top < len(bin)-2 {
+		answer = 0
 	} else if sum(bin) == 1 {
-		if input.bottom <= len(bin) && input.top >= len(bin) {
-			answer = len(bin) - input.bottom + 1
-		} else if input.bottom <= len(bin) && input.top < len(bin) {
-			fmt.Println("...")
-			answer = input.top - input.bottom + 1
+		if input.top == input.bottom && input.top == len(bin)-1 {
+			answer = 1
+		} else if input.top == len(bin)-2 && input.bottom <= input.top {
+			answer = 1
 		} else {
 			answer = 0
 		}
 	} else {
 		front := build(len(bin))
 		back := trim(bin[:len(bin)-1])
-		fmt.Println(front, back)
+		for up := input.top; up >= input.bottom+1; up-- {
+			for down := up - 1; down >= input.bottom; down-- {
+				answer += ways(setup{front, input.top, up}) * ways(setup{back, down, input.bottom})
 
-		backa := ways(setup{back, len(back), input.bottom})
-		backb := ways(setup{back, len(back) - 1, input.bottom})
-
-		fronta := ways(setup{front, input.top, len(back) + 1})
-		frontb := ways(setup{front, input.top, len(back)})
+			}
+		}
 
 	}
 
@@ -77,7 +77,23 @@ func sum(a string) (total int) {
 func main() {
 	starttime := time.Now()
 
-	fmt.Println(ways(setup{"101", 4, 0}))
+	//backwards binary representation of 10^25
+	n := "000000000000000000000000010100100001001010000000001010000110100010101001101000100001"
+
+	total := int64(0)
+
+	for i := 0; i < len(n); i++ {
+
+		for j := i; j < len(n); j++ {
+			if ways(setup{n, j, i}) != 0 {
+
+				total += ways(setup{n, j, i})
+			}
+
+		}
+	}
+
+	fmt.Println(total)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 
