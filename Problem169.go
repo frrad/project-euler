@@ -14,6 +14,8 @@ type setup struct {
 
 var table = make(map[setup]int64)
 
+//How many ways can we represent "string" using power of two between
+// 2^bottom and 2^top, where both of these must be present
 func ways(input setup) int64 {
 	if answer, ok := table[input]; ok {
 		return answer
