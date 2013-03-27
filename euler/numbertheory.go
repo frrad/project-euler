@@ -32,3 +32,20 @@ func PrimePi(n int64) int64 {
 	}
 	return answer
 }
+
+var factorialtable = make(map[int64]int64)
+
+func Factorial(n int64) int64 {
+	if n == 0 {
+		return 1
+	}
+	if answer, ok := factorialtable[n]; ok {
+		return answer
+	}
+
+	answer := Factorial(n-1) * n
+
+	factorialtable[n] = answer
+
+	return answer
+}
