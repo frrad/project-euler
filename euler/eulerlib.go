@@ -6,16 +6,6 @@ import (
 	"strings"
 )
 
-const (
-	primeTableLength = 100000000
-	//lastPrime = Prime[primeTableLength - 1]
-	lastPrime          = 2038074739
-	totientTableLength = 10000000
-)
-
-var primeTable [primeTableLength]int64
-var totientTable [totientTableLength]int64
-
 func ConcatanInt(a int64, b int64) int64 {
 
 	//wrong string conversion
