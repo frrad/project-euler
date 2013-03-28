@@ -5,30 +5,31 @@ import (
 	"time"
 )
 
-func ways(squares int) int {
-	if squares == 0 {
-		return 1
-	}
+var memo = make(map[int]int64)
+
+func ways(squares int) int64 {
 	if squares < 3 {
 		return 1
 	}
 
-	total := 1 //The empty configuration
+	if answer, ok := memo[squares]; ok {
+		return answer
+	}
 
-	for size := 3; size < squares; size++ {
+	total := int64(1) //The empty configuration
+
+	for size := 3; size <= squares; size++ {
 		for start := 0; start <= squares-size; start++ {
-			answer := 1
-			if start > 0 {
-				answer *= ways(start - 1)
-			}
-			if squares-start-size > 0 {
-				answer *= ways(squares - start - size - 1)
-			}
+			answer := int64(1)
+
+			answer *= ways(squares - start - size - 1)
+
 			total += answer
-			fmt.Println(answer, "ways to fill", squares, "after start:", start, "size:", size)
 		}
 
 	}
+
+	memo[squares] = total
 
 	return total
 }
@@ -36,7 +37,7 @@ func ways(squares int) int {
 func main() {
 	starttime := time.Now()
 
-	fmt.Println(ways(4) + 2)
+	fmt.Println(ways(50))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 
