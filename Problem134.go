@@ -38,7 +38,7 @@ func main() {
 	}()
 
 	total := int64(0)
-	for i := int64(0); i < euler.PrimePi(top)-1; i++ {
+	for i := int64(0); i < euler.PrimePi(top)-2; i++ {
 		total += <-c
 	}
 	fmt.Println(total)
