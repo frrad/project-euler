@@ -14,6 +14,8 @@ func main() {
 
 	starttime := time.Now()
 
+	euler.PrimeCache(target)
+
 	counter := int64(0)
 
 	for i := int64(1); euler.Prime(i)*euler.Prime(i) < target; i++ {
