@@ -18,23 +18,6 @@ func IsSquare(x int64) bool {
 	return int64(math.Sqrt(float64(x)))*int64(math.Sqrt(float64(x))) == x
 }
 
-//returns the nth permutation of the given list
-func Permutation(n int, list []int) []int {
-	if len(list) == 1 {
-		return list
-	}
-
-	k := n % len(list)
-
-	first := []int{list[k]}
-	next := make([]int, len(list)-1)
-
-	copy(next, append(list[:k], list[k+1:]...))
-
-	return append(first, Permutation(n/len(list), next)...)
-
-}
-
 //removes duplicate entries in a SORTED vector.
 func RemoveDuplicates(input []int64) []int64 {
 
