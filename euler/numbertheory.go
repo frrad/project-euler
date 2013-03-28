@@ -1,8 +1,6 @@
 package euler
 
-import (
-	"fmt"
-)
+import ()
 
 const (
 	primeTableLength = 100000000
