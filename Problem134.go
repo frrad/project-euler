@@ -6,6 +6,8 @@ import (
 	"time"
 )
 
+const top = 1000000
+
 func pair(p1, p2 int64, c chan int64) {
 	mod := int64(10)
 
@@ -25,19 +27,18 @@ func pair(p1, p2 int64, c chan int64) {
 func main() {
 	starttime := time.Now()
 
-	euler.PrimeCache(1000000)
+	euler.PrimeCache(top)
 
 	c := make(chan int64)
 
-	count := 0
-	for i := int64(3); euler.Prime(i) < 1000000; i++ {
-		go pair(euler.Prime(i), euler.Prime(i+1), c)
-		count++
-
-	}
+	go func() {
+		for i := int64(3); euler.Prime(i) < top; i++ {
+			go pair(euler.Prime(i), euler.Prime(i+1), c)
+		}
+	}()
 
 	total := int64(0)
-	for i := 0; i < count; i++ {
+	for i := int64(0); i < euler.PrimePi(top)-1; i++ {
 		total += <-c
 	}
 	fmt.Println(total)
