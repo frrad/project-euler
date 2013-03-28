@@ -17,6 +17,22 @@ func Permutation(n int, list []int) []int {
 
 }
 
+func PermuteFloats(n int, list []float64) []float64 {
+	if len(list) == 1 {
+		return list
+	}
+
+	k := n % len(list)
+
+	first := []float64{list[k]}
+	next := make([]float64, len(list)-1)
+
+	copy(next, append(list[:k], list[k+1:]...))
+
+	return append(first, PermuteFloats(n/len(list), next)...)
+
+}
+
 func PermuteString(n int, word string) string {
 	if len(word) == 1 {
 		return word
