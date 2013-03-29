@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./euler"
+	"euler"
 	"fmt"
 	"strconv"
 	"strings"
@@ -33,8 +33,9 @@ func main() {
 	starttime := time.Now()
 
 	origin := point{0, 0}
-	data := euler.Import("problemdata/triangles.txt")
+	data := euler.Import("../problemdata/triangles.txt")
 	total := 0
+
 
 	for _, line := range data {
 
