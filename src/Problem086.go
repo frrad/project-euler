@@ -6,30 +6,65 @@ import (
 	"time"
 )
 
+func sort(a, b int) (int, int) {
+	if a < b {
+		return a, b
+	}
+	return b, a
+}
+
+func routes(M int) (total int) {
+
+	maxm := M //could be more clever
+
+	for n := 1; n < maxm; n++ {
+
+		for m := n + 1; m < maxm; m += 2 {
+
+			if euler.GCD(int64(m), int64(n)) == 1 {
+
+				a := m*m - n*n
+				b := 2 * m * n
+				a, b = sort(a, b)
+
+				//a is two sides case
+				for k := 1; k*b <= M; k++ {
+					total += (a * k) / 2
+				}
+
+				//b is two sides case
+				if 2*a >= b {
+					for k := 1; k*a <= M; k++ {
+						total += ((2 * a * k) - (b * k) + 2) / 2
+					}
+				}
+			}
+
+		}
+
+	}
+	return
+}
+
 func main() {
 	starttime := time.Now()
 
-	var total, M int
+	seek := 1000000
+	a, b := 2, 10000
 
-	for M = 1; total < 1000000; M++ {
+	for b-a > 1 {
 
-		total = 0
-		for a := 1; a <= M; a++ {
-			for b := a; b <= M; b++ {
-				for c := b; c <= M; c++ {
+		c := (b + a) / 2
 
-					best := (a+b)*(a+b) + (c * c)
-
-					if euler.IsSquare(int64(best)) {
-						total++
-					}
-
-				}
-			}
+		if routes(c) >= seek {
+			b = c
+		} else {
+			a = c
 		}
 
-		fmt.Println(M, total)
 	}
-	fmt.Println(M - 1)
+
+	fmt.Println(b)
+
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
