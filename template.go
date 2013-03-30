@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./euler"
+	"euler"
 	"fmt"
 	"time"
 )
@@ -12,5 +12,4 @@ func main() {
 	fmt.Println("Hello, World", euler.Prime(10000))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
-
 }
