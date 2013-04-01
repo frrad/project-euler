@@ -1,6 +1,6 @@
 package euler
 
-import ()
+import "math"
 
 const (
 	primeTableLength = 100000000
@@ -86,4 +86,10 @@ func Factorial(n int64) int64 {
 	factorialtable[n] = answer
 
 	return answer
+}
+
+func IntSqrt(n int64) (sqrt int64, square bool) {
+	sqrt = int64(math.Sqrt(float64(n)))
+	square = sqrt*sqrt == n
+	return
 }
