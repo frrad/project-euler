@@ -21,23 +21,6 @@ func prod(list []int) (prod int) {
 	return
 }
 
-func loopy(depth, max, which int) []int {
-
-	if depth == 1 {
-		return []int{which%max + 1}
-	}
-
-	return append(loopy(depth-1, max, which/max), which%max+1)
-
-}
-
-func ones(depth int) []int {
-	if depth == 1 {
-		return []int{1}
-	}
-	return append(ones(depth-1), 1)
-}
-
 const (
 	infinity = 99999999
 )
@@ -69,7 +52,7 @@ func search(length int, c chan int) {
 		leftprod := int64(1)
 
 		var rightprod int64
-		if start >= 2 && 1+length-lvl >= 18 {
+		if start >= 2 && 1+length-lvl >= 13 {
 			rightprod = infinity
 		} else {
 			rightprod = euler.IntExp(int64(start), int64(1+length-lvl))
@@ -89,7 +72,7 @@ func search(length int, c chan int) {
 				leftprod = 1
 			}
 
-			if test[lvl-1] >= 2 && 1+length-lvl >= 18 {
+			if test[lvl-1] >= 2 && 1+length-lvl >= 13 {
 				rightprod = infinity
 			} else {
 				rightprod = euler.IntExp(int64(test[lvl-1]), int64(1+length-lvl))
