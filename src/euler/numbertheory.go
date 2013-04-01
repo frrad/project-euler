@@ -2,6 +2,73 @@ package euler
 
 import "math"
 
+func Divisors(n int64) int64 {
+	factors := Factors(n)
+	div := int64(1)
+	for i := 0; i < len(factors); i++ {
+		div *= factors[i][1] + 1
+	}
+	return div
+}
+
+//returns an ordered list of distinct factors
+func Factor(n int64) []int64 {
+	var answer = []int64{}
+
+	current := n
+
+	i := int64(1)
+	for !IsPrime(current) {
+		if current%Prime(i) == 0 {
+			answer = append(answer, Prime(i))
+			current = current / Prime(i)
+			i = 0
+		}
+		i++
+	}
+
+	answer = append(answer, current)
+
+	return answer
+}
+
+//an ordered list of prime factors, together with their degrees
+func Factors(n int64) [][2]int64 {
+	factorList := Factor(n)
+	factors := [][2]int64{[2]int64{factorList[0], 1}}
+	for i := 1; i < len(factorList); i++ {
+		if factorList[i] == factors[len(factors)-1][0] {
+			factors[len(factors)-1][1]++
+		} else {
+			factors = append(factors, [2]int64{factorList[i], 1})
+		}
+	}
+	return factors
+}
+
+var factorialtable = make(map[int64]int64)
+
+func Factorial(n int64) int64 {
+	if n == 0 {
+		return 1
+	}
+	if answer, ok := factorialtable[n]; ok {
+		return answer
+	}
+
+	answer := Factorial(n-1) * n
+
+	factorialtable[n] = answer
+
+	return answer
+}
+
+func IntSqrt(n int64) (sqrt int64, square bool) {
+	sqrt = int64(math.Sqrt(float64(n)))
+	square = sqrt*sqrt == n
+	return
+}
+
 const (
 	primeTableLength = 100000000
 	//lastPrime = Prime[primeTableLength - 1]
@@ -69,27 +136,4 @@ func PrimeCache(n int64) {
 			m++
 		}
 	}
-}
-
-var factorialtable = make(map[int64]int64)
-
-func Factorial(n int64) int64 {
-	if n == 0 {
-		return 1
-	}
-	if answer, ok := factorialtable[n]; ok {
-		return answer
-	}
-
-	answer := Factorial(n-1) * n
-
-	factorialtable[n] = answer
-
-	return answer
-}
-
-func IntSqrt(n int64) (sqrt int64, square bool) {
-	sqrt = int64(math.Sqrt(float64(n)))
-	square = sqrt*sqrt == n
-	return
 }

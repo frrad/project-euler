@@ -149,27 +149,6 @@ func Prime(n int64) int64 {
 	return i
 }
 
-//returns an ordered list of distinct factors
-func Factor(n int64) []int64 {
-	var answer = []int64{}
-
-	current := n
-
-	i := int64(1)
-	for !IsPrime(current) {
-		if current%Prime(i) == 0 {
-			answer = append(answer, Prime(i))
-			current = current / Prime(i)
-			i = 0
-		}
-		i++
-	}
-
-	answer = append(answer, current)
-
-	return answer
-}
-
 func Exp2(n int) int64 {
 	answer := int64(1)
 	for i := 0; i < n; i++ {
