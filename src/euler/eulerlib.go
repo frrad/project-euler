@@ -261,11 +261,25 @@ func ArePermutations(a int64, b int64) bool {
 
 }
 
+func MinInt(m, n int) int {
+	if m < n {
+		return m
+	}
+	return n
+}
+
 func Min(m int64, n int64) int64 {
 	if m < n {
 		return m
 	}
 	return n
+}
+
+func MaxInt(m, n int) int {
+	if m < n {
+		return n
+	}
+	return m
 }
 
 func Max(m int64, n int64) int64 {
