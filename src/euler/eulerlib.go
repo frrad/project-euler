@@ -67,7 +67,7 @@ func Totient(n int64) int64 {
 
 }
 
-func BubbleSort(word string) string {
+func Sort(word string) string {
 	wordtable := strings.Split(word, "")
 	for j := 0; j < len(word); j++ {
 
@@ -82,7 +82,22 @@ func BubbleSort(word string) string {
 	return strings.Join(wordtable, "")
 }
 
-func BubbleSortInts(list []int) []int {
+func SortInts(list []int) []int {
+
+	for j := 0; j < len(list); j++ {
+
+		for i := 0; i < len(list)-1; i++ {
+			if list[i] < list[i+1] {
+				temp := list[i]
+				list[i] = list[i+1]
+				list[i+1] = temp
+			}
+		}
+	}
+	return list
+}
+
+func SortLInts(list []int64) []int64 {
 
 	for j := 0; j < len(list); j++ {
 
@@ -99,7 +114,7 @@ func BubbleSortInts(list []int) []int {
 
 func SortInt(input int64) int64 {
 
-	swapped, _ := strconv.ParseInt(BubbleSort(strconv.FormatInt(input, 10)), 10, 64)
+	swapped, _ := strconv.ParseInt(Sort(strconv.FormatInt(input, 10)), 10, 64)
 
 	return swapped
 
@@ -312,9 +327,8 @@ func FracReduce(num int64, den int64) (int64, int64) {
 
 func DigitSum(N int64) (sum int) {
 
-	n := int(N)
 	sum = 0
-	word := strconv.Itoa(n)
+	word := strconv.FormatInt(N, 10)
 
 	for i := 0; i < len(word); i++ {
 		x, _ := strconv.Atoi(string(word[i]))
