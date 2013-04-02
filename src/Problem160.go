@@ -7,6 +7,11 @@ import (
 
 var memo = make(map[int64][2]int64)
 
+const (
+	target = 1000000000000
+	mod    = 100000
+)
+
 func fac(n int64) [2]int64 {
 	if answer, ok := memo[n]; ok {
 		return answer
@@ -30,7 +35,7 @@ func fac(n int64) [2]int64 {
 		offset++
 	}
 
-	answer = answer % 100000
+	answer = answer % mod
 
 	memo[n] = [2]int64{answer, base + offset}
 
@@ -41,22 +46,41 @@ func fac(n int64) [2]int64 {
 
 }
 
-const target = 1000000000000
+func prod(a, b [2]int64) [2]int64 {
+
+	offset := a[1] + b[1]
+	for a[0]%10 == 0 {
+		a[0] = a[0] / 10
+		offset++
+	}
+	for b[0]%10 == 0 {
+		b[0] = b[0] / 10
+		offset++
+	}
+
+	return [2]int64{(a[0] * b[0]) % mod, offset}
+}
+
+func exp(a [2]int64, pow int64) [2]int64 {
+	if pow == 1 {
+		return a
+	}
+	if pow%2 == 0 {
+		return prod(exp(a, pow/2), exp(a, pow/2))
+	}
+	return prod(prod(exp(a, pow/2), exp(a, pow/2)), a)
+}
 
 func main() {
 	starttime := time.Now()
 
 	memo[0] = [2]int64{1, 0}
 
-	for i := int64(0); i <= target; i++ {
+	fmt.Println(fac(mod - 1))
 
-		if i%1000000 == 0 {
-			fmt.Println(100*float64(i)/float64(target), "\b%", i, fac(i))
-		}
+	intermediate := fac(mod - 1)
 
-	}
-
-	fmt.Println(fac(target))
+	fmt.Println(exp(intermediate, target/mod))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
