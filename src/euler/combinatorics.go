@@ -1,5 +1,43 @@
 package euler
 
+func Choose(N, K int64) int64 {
+	factors := make(map[int64]int64)
+
+	for n := N; n >= 2; n-- {
+		nfactors := Factors(n)
+		for i := 0; i < len(nfactors); i++ {
+			factors[nfactors[i][0]] += nfactors[i][1]
+		}
+	}
+
+	for k := K; k >= 2; k-- {
+
+		kfactors := Factors(k)
+		for i := 0; i < len(kfactors); i++ {
+			factors[kfactors[i][0]] -= kfactors[i][1]
+		}
+
+	}
+
+	for nik := N - K; nik >= 2; nik-- {
+		nikfactors := Factors(nik)
+		for i := 0; i < len(nikfactors); i++ {
+			factors[nikfactors[i][0]] -= nikfactors[i][1]
+		}
+
+	}
+	answer := int64(1)
+
+	for prime, multiplicity := range factors {
+
+		for i := int64(0); i < multiplicity; i++ {
+			answer *= prime
+		}
+
+	}
+	return answer
+}
+
 //returns the nth permutation of the given slice
 func Permutation(n int, list []int) []int {
 	if len(list) == 1 {

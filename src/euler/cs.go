@@ -7,3 +7,10 @@ func ReverseLInts(list []int64) []int64 {
 	}
 	return list
 }
+
+func MaxFloat(a, b float64) float64 {
+	if a > b {
+		return a
+	}
+	return b
+}
