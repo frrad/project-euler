@@ -1,38 +1,48 @@
 package main
 
 import (
-	"euler"
 	"fmt"
 	"time"
+)
+
+const (
+	N = 20000000
+	K = 15000000
 )
 
 func main() {
 	starttime := time.Now()
 
-	N := int64(20000000)
-	K := int64(15000000)
-
 	factors := make(map[int64]int64)
 
-	for n := N; n > N-K; n-- {
-		nfactors := euler.Factors(n)
-		for i := 0; i < len(nfactors); i++ {
-			factors[nfactors[i][0]] += nfactors[i][1]
-		}
-		fmt.Println(n)
+	var seive [N + 1]int64
+
+	for i := int64(0); i < N+1; i++ {
+		seive[i] = i
 	}
 
-	for k := K; k >= 2; k-- {
+	for start := 2; start < len(seive); {
 
-		kfactors := euler.Factors(k)
-		for i := 0; i < len(kfactors); i++ {
-			factors[kfactors[i][0]] -= kfactors[i][1]
+		scrape := seive[start]
+
+		for i := 1; i*start < len(seive); i++ {
+
+			factors[scrape]++
+			if i*start <= N-K {
+				factors[scrape]--
+			}
+			if i*start <= K {
+				factors[scrape]--
+			}
+
+			seive[start*i] = seive[start*i] / scrape
 		}
-		fmt.Println(k)
+
+		for ; start < len(seive) && seive[start] == 1; start++ {
+
+		}
 
 	}
-
-	fmt.Println(factors)
 
 	answer := int64(0)
 

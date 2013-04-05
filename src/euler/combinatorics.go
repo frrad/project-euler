@@ -3,6 +3,14 @@ package euler
 func Choose(N, K int64) int64 {
 	factors := make(map[int64]int64)
 
+	if K == 0 || N == K || N <= 1 {
+		return 1
+	}
+
+	if N < K {
+		return 0
+	}
+
 	for n := N; n > N-K; n-- {
 		nfactors := Factors(n)
 		for i := 0; i < len(nfactors); i++ {
@@ -72,6 +80,40 @@ func PermuteString(n int, word string) string {
 	k := n % len(word)
 
 	return word[k:k+1] + PermuteString(n/len(word), word[:k]+word[k+1:])
+}
+
+func SplitInts(list []int, K, N int) (a, b []int) {
+	a, b = make([]int, 0), make([]int, 0)
+
+	indices := make(map[int]bool)
+
+	for k := K; k >= 1; k-- {
+
+		n := k - 1
+
+		if Choose(int64(n), int64(k)) <= int64(N) {
+			for ; Choose(int64(n), int64(k)) <= int64(N); n++ {
+
+			}
+			n--
+		}
+
+		indices[n] = true
+
+		N = N - int(Choose(int64(n), int64(k)))
+	}
+
+	a, b = make([]int, 0), make([]int, 0)
+
+	for i := 0; i < len(list); i++ {
+		if indices[i] {
+			a = append(a, list[i])
+		} else {
+			b = append(b, list[i])
+		}
+	}
+
+	return a, b
 }
 
 //returns which permutation takes a->b, or -1

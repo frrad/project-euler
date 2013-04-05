@@ -9,11 +9,23 @@ import (
 )
 
 func isSpecial(set []int) bool {
-	length := len(set)
-	a, b := make([]int, length), make([]int, length)
-	for i := int64(0); i < euler.Factorial(int64(length)); i++ {
-		return false
+	for size := 2; size <= len(set); size++ {
+		for i := 0; int64(i) < euler.Choose(int64(len(set)), int64(size)); i++ {
+			brett, _ := euler.SplitInts(set, size, i)
+			for k := 1; k <= len(brett)/2; k++ {
+				for j := 0; int64(j) < euler.Choose(int64(len(brett)), int64(k)); j++ {
+					a, b := euler.SplitInts(brett, k, j)
+					if sum(a) == sum(b) {
+						return false
+					}
+					if len(b) > len(a) && sum(a) > sum(b) {
+						return false
+					}
+				}
+			}
+		}
 	}
+	return true
 }
 
 func sum(set []int) (total int) {
@@ -41,7 +53,6 @@ func main() {
 
 	for _, set := range sets {
 		if isSpecial(set) {
-			fmt.Println(set)
 			total += sum(set)
 		}
 	}
