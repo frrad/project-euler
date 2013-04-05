@@ -116,6 +116,29 @@ func SplitInts(list []int, K, N int) (a, b []int) {
 	return a, b
 }
 
+func SplitSeq(K, N int) (a []int) {
+
+	indices := make([]int, 0)
+
+	for k := K; k >= 1; k-- {
+
+		n := k - 1
+
+		if Choose(int64(n), int64(k)) <= int64(N) {
+			for ; Choose(int64(n), int64(k)) <= int64(N); n++ {
+
+			}
+			n--
+		}
+
+		indices = append(indices, n)
+
+		N = N - int(Choose(int64(n), int64(k)))
+	}
+
+	return indices
+}
+
 //returns which permutation takes a->b, or -1
 //NOTE: THIS IS A TERRIBLE ALGORITHM -- Fix later
 func UnPermuteStrings(a, b string) int {

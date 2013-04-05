@@ -4,62 +4,70 @@ import (
 	"euler"
 	"fmt"
 	"strconv"
-	"strings"
 	"time"
 )
 
-func runs(s string) []int {
-	answer := make([]int, 10)
+func test(repeat string, n, d int) (N int, S int64) {
 
-	digits := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+	for i := 0; int64(i) < euler.Choose(int64(n), int64(d)); i++ {
+		indices := euler.SplitSeq(d, i)
 
-	for i, digit := range digits {
+		for j := 0; int64(j) < euler.IntExp(10, int64(d)); j++ {
+			insertstring := strconv.Itoa(j)
+			for len(insertstring) < d {
+				insertstring = "0" + insertstring
+			}
 
-		answer[i] = strings.Count(s, digit)
-
-	}
-
-	return answer
-}
-
-func main() {
-	starttime := time.Now()
-
-	euler.PrimeCache(1000000)
-
-	d := int64(10)
-
-	start := euler.IntExp(10, d-1)
-	end := euler.IntExp(10, d)
-
-	m, n, s := make([]int, 10), make([]int, 10), make([]int64, 10)
-
-	for prime := start; prime < end; prime++ {
-
-		if prime%1000000 == 0 {
-			fmt.Println((100 * float64(prime-start) / float64(end-start)), "\b%")
-		}
-
-		if euler.IsPrime(prime) {
-			this := runs(strconv.FormatInt(prime, 10))
-
-			for index, value := range this {
-				if value == m[index] {
-					n[index]++
-					s[index] += prime
+			merged := ""
+			current := 0
+			for index := 0; index < n; index++ {
+				if current < d && index == indices[d-current-1] {
+					merged += insertstring[current : current+1]
+					current++
+				} else {
+					merged += repeat
 				}
-				if value > m[index] {
-					m[index] = value
-					n[index] = 1
-					s[index] = prime
+			}
+
+			mergedint, _ := strconv.ParseInt(merged, 10, 64)
+
+			//exclude leading zeroes
+			if mergedint > euler.IntExp(10, int64(n)-1) {
+
+				if euler.IsPrime(mergedint) {
+					//fmt.Println(mergedint)
+					N++
+					S += mergedint
 				}
 			}
 		}
 	}
+	return
+}
+
+const D = 10
+
+func main() {
+	starttime := time.Now()
+
+	digits := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 
 	total := int64(0)
-	for _, summand := range s {
-		total += summand
+
+	for _, char := range digits {
+
+		N := 0
+		S := int64(0)
+		m := 0
+		for m = 0; N == 0; m++ {
+
+			N, S = test(char, D, m)
+
+		}
+
+		//fmt.Println(char, "\t", D-m+1, "\t", N, "\t", S)
+		total += S
+
 	}
 
 	fmt.Println(total)
