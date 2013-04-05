@@ -3,7 +3,7 @@ package euler
 func Choose(N, K int64) int64 {
 	factors := make(map[int64]int64)
 
-	for n := N; n >= 2; n-- {
+	for n := N; n > N-K; n-- {
 		nfactors := Factors(n)
 		for i := 0; i < len(nfactors); i++ {
 			factors[nfactors[i][0]] += nfactors[i][1]
@@ -19,13 +19,6 @@ func Choose(N, K int64) int64 {
 
 	}
 
-	for nik := N - K; nik >= 2; nik-- {
-		nikfactors := Factors(nik)
-		for i := 0; i < len(nikfactors); i++ {
-			factors[nikfactors[i][0]] -= nikfactors[i][1]
-		}
-
-	}
 	answer := int64(1)
 
 	for prime, multiplicity := range factors {
