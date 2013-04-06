@@ -70,10 +70,10 @@ func IntSqrt(n int64) (sqrt int64, square bool) {
 }
 
 const (
-	primeTableLength = 100000000
+	primeTableLength = 1000000
 	//lastPrime = Prime[primeTableLength - 1]
-	lastPrime          = 2038074739
-	totientTableLength = 10000000
+	lastPrime          = 15485857
+	totientTableLength = 100000
 )
 
 var primeTable [primeTableLength]int64
