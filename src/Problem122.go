@@ -48,6 +48,18 @@ func clone(old map[int]bool) map[int]bool {
 	return new
 }
 
+func show(a []map[int]bool) {
+	for _, state := range a {
+
+		for i := 0; i < searchLength; i++ {
+			if state[i] {
+				fmt.Print(i, " ")
+			}
+		}
+		fmt.Println()
+	}
+}
+
 func max(a map[int]bool) int {
 	max := 0
 	for x := range a {
@@ -123,6 +135,7 @@ func main() {
 		//fmt.Println(canhit)
 		fmt.Println("SARCHED", i)
 		fmt.Println(len(canhit), "WAYS")
+		//show(canhit)
 		fmt.Println(results)
 
 		results[1] = 0
