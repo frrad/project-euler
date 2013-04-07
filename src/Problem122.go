@@ -11,12 +11,13 @@ func step(first []map[int]bool) []map[int]bool {
 	answer := make([]map[int]bool, 0)
 	for _, state := range first {
 		//fmt.Println(blrp, "/", len(first))
+		m := max(state)
 		for i := range state {
 			for j := range state {
 				if !state[i+j] {
 					new := clone(state)
 					new[i+j] = true
-					if !kees[keygen(new)] {
+					if max(new) > m && !kees[keygen(new)] {
 						answer = append(answer, new)
 						kees[keygen(new)] = true
 					}
@@ -45,6 +46,16 @@ func clone(old map[int]bool) map[int]bool {
 		new[i] = true
 	}
 	return new
+}
+
+func max(a map[int]bool) int {
+	max := 0
+	for x := range a {
+		if x > max {
+			max = x
+		}
+	}
+	return max
 }
 
 func clean(list []map[int]bool) []map[int]bool {
