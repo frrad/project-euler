@@ -70,7 +70,7 @@ func IntSqrt(n int64) (sqrt int64, square bool) {
 }
 
 const (
-	primeTableLength = 1000000
+	primeTableLength = 10000000 //+1!!!!!!!!!!!
 	//lastPrime = Prime[primeTableLength - 1]
 	lastPrime          = 15485857
 	totientTableLength = 100000
@@ -136,4 +136,12 @@ func PrimeCache(n int64) {
 			m++
 		}
 	}
+}
+
+//if p is the nth prime
+func PrimeN(p int64)  int64 {
+	if !IsPrime(p) {
+		return -1
+	}
+	return PrimePi(p)
 }

@@ -112,6 +112,23 @@ func SortLInts(list []int64) []int64 {
 	return list
 }
 
+
+func SortUInt64( list []uint64 ) []uint64 {
+		for j := 0; j < len(list); j++ {
+
+		for i := 0; i < len(list)-1; i++ {
+			if list[i] > list[i+1] {
+				temp := list[i]
+				list[i] = list[i+1]
+				list[i+1] = temp
+			}
+		}
+	}
+	return list
+}
+
+
+
 func SortInt(input int64) int64 {
 
 	swapped, _ := strconv.ParseInt(Sort(strconv.FormatInt(input, 10)), 10, 64)
@@ -380,18 +397,30 @@ func IsStringPalindrome(n string) bool {
 	return false
 }
 
-func IntExp(a int64, b int64) int64 {
-	if b == 0 {
+func UIntExp(a , b uint64) uint64 {
+		if b == 0 {
 		return 1
 	}
 	if b == 1 {
 		return a
 	}
 	if b%2 == 0 {
-		temp := IntExp(a, b/2)
+		temp := UIntExp(a, b/2)
 		return temp * temp
 	}
-	return a * IntExp(a, b-1)
+	return a * UIntExp(a, b-1)
+}
+
+func IntExp(a int64, b int64) int64 {
+	if a > 0 {
+		return int64 (UIntExp(uint64(a), uint64(b)  ))
+	}
+	if a < 0 && b%2 == 0  {
+		return IntExp(-1 * a , b)
+	}
+
+	return -1 * IntExp(-1 * a , b)
+
 }
 
 func NumberDigits(n int64) int {
