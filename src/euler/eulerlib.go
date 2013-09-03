@@ -154,6 +154,10 @@ func IsPandigital(n int64) bool {
 	return output == SortInt(n)
 }
 
+func UInt64Prime( n uint64) uint64 {
+	return uint64(Prime(int64(n)))
+}
+
 func Prime(n int64) int64 {
 
 	if n < 1 {
@@ -397,7 +401,7 @@ func IsStringPalindrome(n string) bool {
 	return false
 }
 
-func UIntExp(a , b uint64) uint64 {
+func UInt64Exp(a , b uint64) uint64 {
 		if b == 0 {
 		return 1
 	}
@@ -405,15 +409,15 @@ func UIntExp(a , b uint64) uint64 {
 		return a
 	}
 	if b%2 == 0 {
-		temp := UIntExp(a, b/2)
+		temp := UInt64Exp(a, b/2)
 		return temp * temp
 	}
-	return a * UIntExp(a, b-1)
+	return a * UInt64Exp(a, b-1)
 }
 
 func IntExp(a int64, b int64) int64 {
 	if a > 0 {
-		return int64 (UIntExp(uint64(a), uint64(b)  ))
+		return int64 (UInt64Exp(uint64(a), uint64(b)  ))
 	}
 	if a < 0 && b%2 == 0  {
 		return IntExp(-1 * a , b)
