@@ -54,10 +54,9 @@ func luckySeive(max int) []int {
 }
 
 func main() {
+	lineL := 40
 
-	fmt.Println("Reading File...")
 	page := euler.Import("../problemdata/Project Euler.html")
-	fmt.Println("File Read...\n")
 
 	max := -1 //number of problems total
 	dict := make(map[int]bool)
@@ -100,6 +99,7 @@ func main() {
 	prime := 0
 	triangle := 0
 	lucky := 0
+	dec2 := 0
 
 	for i := 1; i <= 25; i++ {
 		if dict[i*(i+1)/2] {
@@ -123,9 +123,26 @@ func main() {
 		}
 	}
 
+	for i := 0; i < 10; i++ {
+		here := 0
+		for j := 200 + 10*i + 1; j < 200+10*(i+1)+1; j++ {
+			if dict[j] {
+				here++
+			}
+		}
+
+		if here > 0 {
+			dec2++
+		}
+	}
+
 	fmt.Println("Done", done, "/", max, " problems")
 
-	lineL := 40
+	for i := 0; i < lineL; i++ {
+		fmt.Print("=")
+	}
+	fmt.Print("\n")
+
 	for i := 1; i <= max; i++ {
 		if dict[i] {
 			fmt.Print("X")
@@ -140,9 +157,106 @@ func main() {
 	if max%lineL != 0 {
 		fmt.Print("\n")
 	}
+	for i := 0; i < lineL; i++ {
+		fmt.Print("=")
+	}
+	fmt.Print("\n\n")
 
 	fmt.Println("Prime Obsession:\t", prime, "/ 50 prime numbered problems")
 	fmt.Println("Triangle Trophy:\t", triangle, "/ 25 first triangle numbered problems")
 	fmt.Println("Lucky Luke:\t\t", lucky, "/ 50 lucky numbered problems")
+	fmt.Println("Decimation II:\t\t", dec2, "/ 10 rows")
+
+	fmt.Print("\n")
+
+	track := make(map[int]int)
+
+	if prime < 50 {
+		fmt.Print("Primes: ")
+		for i := 1; i < max; i++ {
+			if !dict[i] && euler.IsPrime(int64(i)) {
+				fmt.Print(i, " ")
+				track[i]++
+			}
+		}
+		fmt.Print("\n")
+	}
+
+	if triangle < 25 {
+		fmt.Print("Triangle Numbers: ")
+
+		for i := 1; i <= 25; i++ {
+			if !dict[i*(i+1)/2] {
+				fmt.Print(i*(i+1)/2, " ")
+				track[i*(i+1)/2]++
+			}
+		}
+
+		fmt.Print("\n")
+
+	}
+
+	if lucky < 50 {
+		fmt.Print("Lucky Numbers: ")
+
+		for i := 0; i < len(luckyseive); i++ {
+			if !dict[luckyseive[i]] {
+				fmt.Print(luckyseive[i], " ")
+				track[luckyseive[i]]++
+			}
+		}
+
+		fmt.Print("\n")
+	}
+
+	if dec2 < 10 {
+		fmt.Print("Decimation II: ")
+
+		for i := 0; i < 10; i++ {
+			here := 0
+			for j := 200 + 10*i + 1; j < 200+10*(i+1)+1; j++ {
+				if dict[j] {
+					here++
+				}
+			}
+
+			if here == 0 {
+				for j := 200 + 10*i + 1; j < 200+10*(i+1)+1; j++ {
+					fmt.Print(j, " ")
+					track[j]++
+				}
+			}
+		}
+
+		fmt.Print("\n")
+	}
+
+	maxTrack := -1
+
+	fmt.Print("\nRepeats: ")
+
+	for i := 1; i <= max; i++ {
+		if track[i] > 1 {
+			fmt.Print(i, " ")
+
+		}
+		if track[i] > maxTrack {
+			maxTrack = track[i]
+		}
+	}
+
+	fmt.Print("\n")
+
+	fmt.Print("Most Repeated: ")
+
+	for i := 1; i <= max; i++ {
+		if track[i] == maxTrack {
+			fmt.Print(i, " ")
+
+		}
+
+	}
+
+	fmt.Print("\n")
 
 }
