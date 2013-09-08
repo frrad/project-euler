@@ -54,7 +54,7 @@ func luckySeive(max int) []int {
 }
 
 func main() {
-	lineL := 40
+	lineL := 60
 
 	page := euler.Import("../problemdata/Project Euler.html")
 
