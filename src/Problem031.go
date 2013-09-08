@@ -2,6 +2,7 @@ package main
 
 import "fmt"
 
+//Dumbest approach ever : try something recursive instead
 func main() {
 	count := 0
 
