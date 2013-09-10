@@ -1,53 +1,37 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
-//Dumbest approach ever : try something recursive instead
-func main() {
-	count := 0
+var memo map[[2]int]int
 
-	for twobucks := 0; twobucks <= 1; twobucks++ {
-
-		for abuck := 0; abuck <= 2; abuck++ {
-
-			if twobucks*200+abuck*100 <= 200 {
-				for fiddy := 0; fiddy <= 4; fiddy++ {
-
-					if twobucks*200+abuck*100+fiddy*50 <= 200 {
-						for twenty := 0; twenty <= 10; twenty++ {
-
-							if twobucks*200+abuck*100+fiddy*50+twenty*20 <= 200 {
-								for ten := 0; ten <= 20; ten++ {
-
-									if twobucks*200+abuck*100+fiddy*50+twenty*20+ten*10 <= 200 {
-										for five := 0; five <= 40; five++ {
-
-											if twobucks*200+abuck*100+fiddy*50+twenty*20+ten*10+five*5 <= 200 {
-												for two := 0; two <= 100; two++ {
-
-													if twobucks*200+abuck*100+fiddy*50+twenty*20+ten*10+five*5+two*2 <= 200 {
-														for one := 0; one <= 200; one++ {
-
-															if twobucks*200+abuck*100+fiddy*50+twenty*20+ten*10+five*5+two*2+one == 200 {
-																count++
-															}
-
-														}
-													}
-												}
-
-											}
-
-										}
-									}
-								}
-							}
-						}
-					}
-				}
-			}
-		}
+func ways(coins []int, amount int) (answer int) {
+	if len(coins) == 1 {
+		return 1
 	}
 
-	fmt.Println(count)
+	if answer, ok := memo[[2]int{len(coins), amount}]; ok {
+		return answer
+	}
+
+	for i := 0; i <= amount/coins[0]; i++ {
+		answer += ways(coins[1:], amount-(coins[0]*i))
+	}
+
+	memo[[2]int{len(coins), amount}] = answer
+
+	return
+}
+
+func main() {
+	starttime := time.Now()
+
+	//Memoization is overkill
+	memo = make(map[[2]int]int)
+
+	fmt.Println(ways([]int{200, 100, 50, 20, 10, 5, 2, 1}, 200))
+
+	fmt.Println("Elapsed time:", time.Since(starttime))
 }
