@@ -1,72 +1,98 @@
 package main
 
 import (
-	"euler"
 	"fmt"
 	"time"
 )
 
+const max = 120000
+
+var table map[int64]map[int64]bool
+var rable map[int64]int64
+
+func coprime(a, b int64) bool {
+	for prime, _ := range sig(a) {
+		if sig(b)[prime] {
+			return false
+		}
+	}
+	return true
+}
+
+func sig(n int64) map[int64]bool {
+	return table[n]
+}
+
+func populate() {
+	for i := int64(2); i < max; i++ {
+		if _, ok := table[i]; !ok { //prime
+
+			for j := int64(1); i*j < max; j++ {
+				if _, there := table[i*j]; !there {
+					table[i*j] = make(map[int64]bool)
+				}
+				table[i*j][i] = true
+
+			}
+		}
+	}
+}
+
+func rad(a, b, c int64) (r int64) {
+	if b == 1 && c == 1 {
+		if answer, ok := rable[a]; ok {
+			return answer
+		}
+	}
+
+	if b != 1 || c != 1 {
+		return rad(a, 1, 1) * rad(b, 1, 1) * rad(c, 1, 1)
+	}
+
+	r = 1
+	for prime, _ := range sig(a) {
+		r *= prime
+	}
+	for prime, _ := range sig(b) {
+		r *= prime
+	}
+	for prime, _ := range sig(c) {
+		r *= prime
+	}
+
+	rable[a] = r
+	return
+}
+
 func main() {
 	starttime := time.Now()
 
-	searchTop := int64(120000)
+	table = make(map[int64]map[int64]bool)
+	populate()
 
-	csum := int64(0)
-	ccount := 0
+	rable = make(map[int64]int64)
 
-	for c := int64(1); c < searchTop; c++ {
+	count, sum := 0, int64(0)
 
-		if c%1500 == 0 {
-			fmt.Println("C=", c)
+	for c := int64(2); c < max; c++ {
+
+		if rad(c, 1, 1) >= c/2 { //rad(abc) > c for all a,b
+			continue
 		}
 
 		for a := int64(1); a < c/2; a++ {
-
 			b := c - a
+			if coprime(a, b) && rad(a, b, c) < c {
+				fmt.Println(a, "\t", b, "\t", c, "\t\t", count, "\t", sum)
+				count++
+				sum += int64(c)
 
-			if euler.GCD(a, b) != 1 {
-				continue
 			}
-
-			rad := int64(1)
-			ABC := [3]int64{a, b, c}
-			broke := false
-
-			for _, abc := range ABC {
-
-				p := int64(2)
-
-				for abc > 1 && broke == false {
-					if abc%p == 0 {
-						rad *= p
-						for abc%p == 0 {
-							abc /= p
-						}
-					}
-					if rad > c {
-						broke = true
-						break
-					}
-					p++
-				}
-
-				if broke {
-					continue
-				}
-			}
-
-			if broke {
-				continue
-			}
-
-			ccount++
-			csum += c
-			fmt.Println(a, b, c)
-			fmt.Println(ccount, csum, "\n")
-
 		}
 
 	}
+
+	fmt.Println(count, sum)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
