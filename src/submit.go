@@ -4,15 +4,16 @@ import (
 	"euler"
 	"fmt"
 	"io/ioutil"
-"time"
 	"net/http"
-"os/exec"
 	"net/url"
-"strconv"
-"strings"
-	)
+	"os/exec"
+	"strconv"
+	"strings"
+	"time"
+)
 
 var settings map[string]string
+
 const permissions = 777
 const setPath = "../eulerdata/settings.dat"
 
@@ -33,7 +34,7 @@ func (p *myjar) Cookies(u *url.URL) []*http.Cookie {
 }
 
 //given an authenticated client writes status.html to given path
-func getStatus(client *http.Client, path string){
+func getStatus(client *http.Client, path string) {
 
 	resp, err := client.Get(settings["statPath"])
 	if err != nil {
@@ -48,12 +49,12 @@ func getStatus(client *http.Client, path string){
 	//fmt.Println(string(b))
 }
 
-func auth(client *http.Client, uname, pass string){
+func auth(client *http.Client, uname, pass string) {
 	form := make(url.Values)
 	form.Set("username", uname)
 	form.Set("password", pass)
 	form.Set("remember", "1")
-	form.Set("login","Login")
+	form.Set("login", "Login")
 
 	// Authenticate
 	_, err := client.PostForm("http://projecteuler.net/login", form)
@@ -62,25 +63,45 @@ func auth(client *http.Client, uname, pass string){
 	}
 }
 
-func getSettings(path string) map[string]string{
+func getData(path string) map[string]string {
 	sets := euler.Import(path)
 
-	out:= make(map[string]string)
+	out := make(map[string]string)
 
-	for _, line:= range sets{
-		two := strings.SplitN(line,":",2)
+	for _, line := range sets {
+		two := strings.SplitN(line, ":", 2)
 		out[two[0]] = two[1]
-	}	
+	}
 
 	return out
 }
 
-//takes authenticated client, problem number and solution: submits answer
-func submit(client *http.Client, problem int, solution string) bool{
-	pname := strconv.Itoa(problem)
-	theURL := "http://projecteuler.net/problem="+pname
+func putData(path string, data map[string]string) {
+	out := ""
+	for i := 0; i < 1000; i++ {
+		word := strconv.Itoa(i)
+		if ans, ok := data[word]; ok {
+			out += word + ":" + ans + "\n"
+		}
+	}
 
-	fmt.Println("Fetching Problem...",problem)
+	ioutil.WriteFile(path, proccess(out), permissions)
+}
+
+func proccess(a string) []byte {
+	out := make([]byte, 0)
+	for i := 0; i < len(a); i++ {
+		out = append(out, a[i])
+	}
+	return out
+}
+
+//takes authenticated client, problem number and solution: submits answer
+func submit(client *http.Client, problem int, solution string) bool {
+	pname := strconv.Itoa(problem)
+	theURL := "http://projecteuler.net/problem=" + pname
+
+	fmt.Println("Fetching Problem...", problem)
 	resp, err := client.Get(theURL)
 	fmt.Println("Page Downloaded.")
 
@@ -94,21 +115,19 @@ func submit(client *http.Client, problem int, solution string) bool{
 	page := string(b)
 
 	capStart := strings.Index(page, "<img src=\"captcha")
-	if capStart == -1{
-		panic("no captcha")
+	if capStart == -1 {
+		panic("no captcha: already submitted?")
 	}
-	capEnd := strings.Index(page[capStart+10:],"\"")
-	capURL := page[capStart + 10:capStart + 10 + capEnd]
+	capEnd := strings.Index(page[capStart+10:], "\"")
+	capURL := page[capStart+10 : capStart+10+capEnd]
 
 	fmt.Println("Downloading Captcha...")
-	resp, err = client.Get("http://projecteuler.net/"+capURL)
-	fmt.Println("Captcha Downloaded.")	
+	resp, err = client.Get("http://projecteuler.net/" + capURL)
+	fmt.Println("Captcha Downloaded.")
 
 	if err != nil {
 		fmt.Printf("Error : %s", err)
-	}	
-
-
+	}
 
 	b, _ = ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
@@ -116,12 +135,11 @@ func submit(client *http.Client, problem int, solution string) bool{
 	fmt.Println("Cracking Captcha...")
 	captcha := crackCap(b)
 
-	fmt.Println("Captcha Solved:",captcha)
+	fmt.Println("Captcha Solved:", captcha)
 
 	form := make(url.Values)
-	form.Set("guess_"+pname,solution)
+	form.Set("guess_"+pname, solution)
 	form.Set("confirm", strconv.Itoa(captcha))
-
 
 	fmt.Println("Submitting...")
 	//Submit
@@ -135,7 +153,6 @@ func submit(client *http.Client, problem int, solution string) bool{
 
 	page = string(b)
 
-	
 	if strings.Contains(page, "answer_wrong.png") {
 		return false
 	}
@@ -144,33 +161,26 @@ func submit(client *http.Client, problem int, solution string) bool{
 		return true
 	}
 
-	if strings.Contains(page, "The confirmation code you entered was not valid"){
+	if strings.Contains(page, "The confirmation code you entered was not valid") {
 		fmt.Println("Captcha Failed!")
 		return false
 	}
 
-
 	return false
 
-	
 }
 
-	
-
-
-
-func crackCap( b []byte) (crack int){
-	timeStr := strconv.FormatInt((time.Now().Unix()),10)
-	path := settings["capPath"]+ timeStr+ ".png"
+func crackCap(b []byte) (crack int) {
+	timeStr := strconv.FormatInt((time.Now().Unix()), 10)
+	path := settings["capPath"] + timeStr + ".png"
 
 	ioutil.WriteFile(path, b, permissions)
 
-	do := exec.Command("ristretto",path)
-	do.Start()	
-	
+	do := exec.Command("ristretto", path)
+	do.Start()
 
 	fmt.Println("Please Input Captcha:")
-	fmt.Scan(&crack)	
+	fmt.Scan(&crack)
 
 	return
 }
@@ -183,28 +193,35 @@ func main() {
 	jar.jar = make(map[string][]*http.Cookie)
 	client.Jar = jar
 
-
-
-	
-
 	settings = make(map[string]string)
 	settings["statPath"] = "http://projecteuler.net/progress"
-	settings["capPath"]= "../eulerdata/captcha/" //trailing slash!
+	settings["capPath"] = "../eulerdata/captcha/" //trailing slash!
+	settings["knownPath"] = "../eulerdata/known.txt"
+	settings["statusPath"] = "../eulerdata/status.html"
 
 	fmt.Println("Reading settings from file...")
-	fileSets := getSettings(setPath)
-	for key, val := range fileSets{
+	fileSets := getData(setPath)
+	for key, val := range fileSets {
 		//settings from file overwrite defaults
 		settings[key] = val
 	}
 
-
 	fmt.Println("Authenticating...")
-	auth(client, settings["username"],settings["password"])
+	auth(client, settings["username"], settings["password"])
 	fmt.Println("Authentication Complete.")
 
-	fmt.Println(	submit(client, 1, "233168") )
+	x, ans := 4, "906609"
+	if submit(client, x, ans) {
 
+		fmt.Println("Correct!")
+		known := getData(settings["knownPath"])
+		known[strconv.Itoa(x)] = ans
+		putData(settings["knownPath"], known)
+		getStatus(client, settings["statusPath"])
+
+	} else {
+		fmt.Println("Incorrect.")
+	}
 
 	//getStatus(client, "../eulerdata/status.html")
 
