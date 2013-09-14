@@ -25,3 +25,4 @@ _testmain.go
 *~
 eulerdata/status.html
 eulerdata/settings.dat
+eulerdata/captcha/*.png
