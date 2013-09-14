@@ -7,6 +7,8 @@ import (
 	"strings"
 )
 
+const path = "../eulerdata/status.html"
+
 func getNum(a string) int {
 	probLen := 8 //Length of `Problem '
 
@@ -56,7 +58,7 @@ func luckySeive(max int) []int {
 func main() {
 	lineL := 60
 
-	page := euler.Import("../problemdata/Project Euler.html")
+	page := euler.Import(path)
 
 	max := -1 //number of problems total
 	dict := make(map[int]bool)
