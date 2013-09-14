@@ -1,11 +1,12 @@
 package main
 
 import (
-	//"euler"
+	"euler"
 	"fmt"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+"strings"
 	)
 
 type myjar struct {
@@ -24,6 +25,7 @@ func (p *myjar) Cookies(u *url.URL) []*http.Cookie {
 	return p.jar[u.Host]
 }
 
+//given an authenticated client writes status.html to given path
 func getStatus(client *http.Client, path string){
 
 
@@ -40,14 +42,7 @@ func getStatus(client *http.Client, path string){
 	//fmt.Println(string(b))
 }
 
-func main() {
-
-	client := &http.Client{}
-
-	jar := &myjar{}
-	jar.jar = make(map[string][]*http.Cookie)
-	client.Jar = jar
-
+func auth(client *http.Client, uname, pass string){
 	form := make(url.Values)
 	form.Set("username", "antest")
 	form.Set("password", "password")
@@ -59,12 +54,37 @@ func main() {
 	if err != nil {
 		fmt.Printf("Error Authenticating: %s", err)
 	}
+}
+
+func getSettings(path string) map[string]string{
+	sets := euler.Import(path)
+
+	out:= make(map[string]string)
+
+	for _, line:= range sets{
+		two := strings.SplitN(line,":",2)
+		out[two[0]] = two[1]
+	}	
+
+
+	return out
+
+}
+
+func main() {
+
+	client := &http.Client{}
+
+	jar := &myjar{}
+	jar.jar = make(map[string][]*http.Cookie)
+	client.Jar = jar
 
 
 
+	settings := getSettings("../eulerdata/settings.dat")
+	auth(client, settings["username"],settings["password"])
 
 
-	/* Get Details */
-	getStatus(client, "../eulerdata/status.html")
+	//getStatus(client, "../eulerdata/status.html")
 
 }
