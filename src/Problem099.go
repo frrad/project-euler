@@ -18,10 +18,12 @@ func biggerThan(a, b, c, d float64) bool {
 func main() {
 	starttime := time.Now()
 
-	data := euler.Import("problemdata/base_exp.txt")
+	data := euler.Import("../problemdata/base_exp.txt")
 
 	maxa := 1.
 	maxb := 1.
+
+	answer := 0
 
 	for i, line := range data {
 		linesplit := strings.Split(line, ",")
@@ -33,9 +35,12 @@ func main() {
 			fmt.Println(line, i+1)
 			maxa = float64(a)
 			maxb = float64(b)
+			answer = i + 1
 		}
 
 	}
+
+	fmt.Println(answer)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 

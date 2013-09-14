@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -14,8 +15,10 @@ import (
 
 var settings map[string]string
 
-const permissions = 777
+const permissions = 0666
 const setPath = "../eulerdata/settings.dat"
+const penet = "http://projecteuler.net"
+const probCount = 1000 //some number > #problems
 
 type myjar struct {
 	jar map[string][]*http.Cookie
@@ -33,34 +36,51 @@ func (p *myjar) Cookies(u *url.URL) []*http.Cookie {
 	return p.jar[u.Host]
 }
 
-//given an authenticated client writes status.html to given path
-func getStatus(client *http.Client, path string) {
+func say(message string, level int) {
+	debugLevel, _ := strconv.Atoi(settings["debug"])
+	if debugLevel >= level {
+		fmt.Println(message)
+	}
+}
 
-	resp, err := client.Get(settings["statPath"])
+//given an authenticated client writes status.html to given path
+func getStatus(client *http.Client) {
+
+	say("Fetching progress page...", 2)
+	resp, err := client.Get(penet + "/progress")
 	if err != nil {
 		fmt.Printf("Error : %s", err)
 	}
 
 	b, _ := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
+	say("Progress page downloaded.", 1)
 
-	ioutil.WriteFile(path, b, permissions)
+	say("Writing page to "+settings["statusPath"], 3)
+	ioutil.WriteFile(settings["statusPath"], b, permissions)
+
+	say(string(b), 5)
 
 	//fmt.Println(string(b))
 }
 
-func auth(client *http.Client, uname, pass string) {
+func auth(client *http.Client) {
+
+	say("Authenticating...", 2)
+
 	form := make(url.Values)
-	form.Set("username", uname)
-	form.Set("password", pass)
+	form.Set("username", settings["username"])
+	form.Set("password", settings["password"])
 	form.Set("remember", "1")
 	form.Set("login", "Login")
 
 	// Authenticate
-	_, err := client.PostForm("http://projecteuler.net/login", form)
+	_, err := client.PostForm(penet+"/login", form)
 	if err != nil {
 		fmt.Printf("Error Authenticating: %s", err)
 	}
+
+	say("Authenticated", 1)
 }
 
 func getData(path string) map[string]string {
@@ -78,7 +98,7 @@ func getData(path string) map[string]string {
 
 func putData(path string, data map[string]string) {
 	out := ""
-	for i := 0; i < 1000; i++ {
+	for i := 0; i < probCount; i++ {
 		word := strconv.Itoa(i)
 		if ans, ok := data[word]; ok {
 			out += word + ":" + ans + "\n"
@@ -97,16 +117,16 @@ func proccess(a string) []byte {
 }
 
 //takes authenticated client, problem number and solution: submits answer
-func submit(client *http.Client, problem int, solution string) bool {
+func submit(client *http.Client, problem int, solution string) (worked bool, message string) {
 	pname := strconv.Itoa(problem)
-	theURL := "http://projecteuler.net/problem=" + pname
+	theURL := penet + "/problem=" + pname
 
-	fmt.Println("Fetching Problem...", problem)
+	say("Fetching Problem... "+pname, 2)
 	resp, err := client.Get(theURL)
-	fmt.Println("Page Downloaded.")
+	say("Problem Downloaded.", 1)
 
 	if err != nil {
-		fmt.Printf("Error : %s", err)
+		return false, "Fetching problem failed"
 	}
 
 	b, _ := ioutil.ReadAll(resp.Body)
@@ -116,17 +136,17 @@ func submit(client *http.Client, problem int, solution string) bool {
 
 	capStart := strings.Index(page, "<img src=\"captcha")
 	if capStart == -1 {
-		panic("no captcha: already submitted?")
+		return false, "Can't find captcha in problem page. Already Submitted?"
 	}
 	capEnd := strings.Index(page[capStart+10:], "\"")
 	capURL := page[capStart+10 : capStart+10+capEnd]
 
-	fmt.Println("Downloading Captcha...")
-	resp, err = client.Get("http://projecteuler.net/" + capURL)
-	fmt.Println("Captcha Downloaded.")
+	say("Downloading Captcha...", 2)
+	resp, err = client.Get(penet + "/" + capURL)
+	say("Captcha Downloaded.", 1)
 
 	if err != nil {
-		fmt.Printf("Error : %s", err)
+		return false, "Fetching captcha failed."
 	}
 
 	b, _ = ioutil.ReadAll(resp.Body)
@@ -145,7 +165,7 @@ func submit(client *http.Client, problem int, solution string) bool {
 	//Submit
 	resp, err = client.PostForm(theURL, form)
 	if err != nil {
-		fmt.Printf("Error Authenticating: %s", err)
+		return false, "Trouble submitting solution"
 	}
 
 	b, _ = ioutil.ReadAll(resp.Body)
@@ -154,19 +174,19 @@ func submit(client *http.Client, problem int, solution string) bool {
 	page = string(b)
 
 	if strings.Contains(page, "answer_wrong.png") {
-		return false
+		return false, "Wrong answer!"
 	}
 
 	if strings.Contains(page, "answer_correct.png") {
-		return true
+		return true, ""
 	}
 
 	if strings.Contains(page, "The confirmation code you entered was not valid") {
-		fmt.Println("Captcha Failed!")
-		return false
+
+		return false, "Captcha Failed!"
 	}
 
-	return false
+	return false, "wtf?"
 
 }
 
@@ -176,13 +196,86 @@ func crackCap(b []byte) (crack int) {
 
 	ioutil.WriteFile(path, b, permissions)
 
-	do := exec.Command("ristretto", path)
+	do := exec.Command(settings["imageViewer"], path)
 	do.Start()
 
 	fmt.Println("Please Input Captcha:")
 	fmt.Scan(&crack)
 
 	return
+}
+
+func runProb(n int) (works bool, message, output string) {
+	nstr := strconv.Itoa(n)
+	for len(nstr) < 3 {
+		nstr = "0" + nstr
+	}
+	nstr = "Problem" + nstr
+
+	cmd := exec.Command("go", "run", nstr+".go")
+	out, err := cmd.StdoutPipe()
+	if err != nil {
+		return false, "Trouble getting pipe.", ""
+	}
+	if err := cmd.Start(); err != nil {
+		return false, "Trouble starting program.", ""
+	}
+
+	b, err := ioutil.ReadAll(out)
+	if err != nil {
+		return false, "Trouble reading output.", ""
+	}
+
+	if err := cmd.Wait(); err != nil {
+		return false, "Program exitted with error.", ""
+	}
+
+	out.Close()
+
+	programOutput := strings.Split(string(b), "\n")
+
+	time := ""
+
+	for i := len(programOutput) - 1; i >= 0; i-- {
+
+		line := programOutput[i]
+
+		say(line, 5)
+
+		if strings.Contains(line, "Elapsed") {
+			time = line
+
+		}
+		if len(line) > 0 && !strings.Contains(line, "Elapsed") {
+			return true, time, line
+
+		}
+	}
+
+	return false, "Can't find output", ""
+
+}
+
+func fancySubmit(client *http.Client, x int, ans string) bool {
+
+	if worked, mess := submit(client, x, ans); worked {
+		say("Correct!", 0)
+
+		say("Adding answer to list...", 2)
+		known := getData(settings["knownPath"])
+		known[strconv.Itoa(x)] = ans
+		putData(settings["knownPath"], known)
+		say("Answer added to list.", 1)
+
+		getStatus(client)
+
+		return true
+
+	} else {
+		say(mess, 0)
+	}
+	return false
+
 }
 
 func main() {
@@ -194,35 +287,57 @@ func main() {
 	client.Jar = jar
 
 	settings = make(map[string]string)
-	settings["statPath"] = "http://projecteuler.net/progress"
 	settings["capPath"] = "../eulerdata/captcha/" //trailing slash!
 	settings["knownPath"] = "../eulerdata/known.txt"
 	settings["statusPath"] = "../eulerdata/status.html"
+	settings["imageViewer"] = "eog"
+	settings["debug"] = "3"
 
-	fmt.Println("Reading settings from file...")
+	say("Reading settings from file...", 1)
 	fileSets := getData(setPath)
 	for key, val := range fileSets {
 		//settings from file overwrite defaults
 		settings[key] = val
 	}
 
-	fmt.Println("Authenticating...")
-	auth(client, settings["username"], settings["password"])
-	fmt.Println("Authentication Complete.")
+	if len(os.Args) == 1 {
+		say("No arguments!", 0)
+	} else if len(os.Args) > 3 {
+		say("Too many arguments!", 0)
+	} else if len(os.Args) == 2 && os.Args[1] == "R" {
+		say("Updating Status:", 0)
+		auth(client)
+		getStatus(client)
+	} else if pnumber, err := strconv.Atoi(os.Args[1]); err == nil {
+		if len(os.Args) == 2 {
 
-	x, ans := 4, "906609"
-	if submit(client, x, ans) {
+			say("Solving #"+strconv.Itoa(pnumber), 1)
+			if works, mess, out := runProb(pnumber); works {
+				say("Answer: "+out, 1)
 
-		fmt.Println("Correct!")
-		known := getData(settings["knownPath"])
-		known[strconv.Itoa(x)] = ans
-		putData(settings["knownPath"], known)
-		getStatus(client, settings["statusPath"])
+				if mess != "" { //time
+					say(mess, 2)
+				}
+
+				auth(client)
+				fancySubmit(client, pnumber, out)
+
+			} else {
+				fmt.Println(mess)
+			}
+		}
+
+		if len(os.Args) == 3 {
+			out := os.Args[2]
+			say("Submitting: "+out, 1)
+
+			auth(client)
+			fancySubmit(client, pnumber, out)
+
+		}
 
 	} else {
-		fmt.Println("Incorrect.")
+		say("Invalid Arguments", 0)
 	}
-
-	//getStatus(client, "../eulerdata/status.html")
 
 }
