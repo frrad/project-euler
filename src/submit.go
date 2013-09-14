@@ -50,8 +50,8 @@ func getStatus(client *http.Client, path string){
 
 func auth(client *http.Client, uname, pass string){
 	form := make(url.Values)
-	form.Set("username", "antest")
-	form.Set("password", "password")
+	form.Set("username", uname)
+	form.Set("password", pass)
 	form.Set("remember", "1")
 	form.Set("login","Login")
 
@@ -76,12 +76,12 @@ func getSettings(path string) map[string]string{
 }
 
 //takes authenticated client, problem number and solution: submits answer
-func submit(client *http.Client, problem int, solution string){
+func submit(client *http.Client, problem int, solution string) bool{
 	pname := strconv.Itoa(problem)
-	url := "http://projecteuler.net/problem="+pname
+	theURL := "http://projecteuler.net/problem="+pname
 
 	fmt.Println("Fetching Problem...",problem)
-	resp, err := client.Get(url)
+	resp, err := client.Get(theURL)
 	fmt.Println("Page Downloaded.")
 
 	if err != nil {
@@ -118,8 +118,46 @@ func submit(client *http.Client, problem int, solution string){
 
 	fmt.Println("Captcha Solved:",captcha)
 
+	form := make(url.Values)
+	form.Set("guess_"+pname,solution)
+	form.Set("confirm", strconv.Itoa(captcha))
 
+
+	fmt.Println("Submitting...")
+	//Submit
+	resp, err = client.PostForm(theURL, form)
+	if err != nil {
+		fmt.Printf("Error Authenticating: %s", err)
+	}
+
+	b, _ = ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
+
+	page = string(b)
+
+	
+	if strings.Contains(page, "answer_wrong.png") {
+		return false
+	}
+
+	if strings.Contains(page, "answer_correct.png") {
+		return true
+	}
+
+	if strings.Contains(page, "The confirmation code you entered was not valid"){
+		fmt.Println("Captcha Failed!")
+		return false
+	}
+
+
+	return false
+
+	
 }
+
+	
+
+
 
 func crackCap( b []byte) (crack int){
 	timeStr := strconv.FormatInt((time.Now().Unix()),10)
@@ -165,7 +203,7 @@ func main() {
 	auth(client, settings["username"],settings["password"])
 	fmt.Println("Authentication Complete.")
 
-	submit(client, 11, "")
+	fmt.Println(	submit(client, 1, "233168") )
 
 
 	//getStatus(client, "../eulerdata/status.html")
