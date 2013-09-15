@@ -159,7 +159,7 @@ func submit(client *http.Client, problem int, solution string) (worked bool, mes
 
 	form := make(url.Values)
 	form.Set("guess_"+pname, solution)
-	form.Set("confirm", strconv.Itoa(captcha))
+	form.Set("confirm", captcha)
 
 	fmt.Println("Submitting...")
 	//Submit
@@ -190,7 +190,7 @@ func submit(client *http.Client, problem int, solution string) (worked bool, mes
 
 }
 
-func crackCap(b []byte) (crack int) {
+func crackCap(b []byte) (crack string) {
 	timeStr := strconv.FormatInt((time.Now().Unix()), 10)
 	path := settings["capPath"] + timeStr + ".png"
 
@@ -260,6 +260,7 @@ func fancySubmit(client *http.Client, x int, ans string) bool {
 
 	if worked, mess := submit(client, x, ans); worked {
 		say("Correct!", 0)
+		say(penet+"/thread="+strconv.Itoa(x), 1)
 
 		say("Adding answer to list...", 2)
 		known := getData(settings["knownPath"])
