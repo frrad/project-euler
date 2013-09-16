@@ -314,6 +314,8 @@ func fancySubmit(x int, ans string) bool {
 		say("Answer in list:", 1)
 		if correct {
 			say("Correct!", 0)
+			say(penet+"/thread="+strconv.Itoa(x), 1)
+
 		} else {
 			say("Wrong answer!", 0)
 
