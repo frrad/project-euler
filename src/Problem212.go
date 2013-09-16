@@ -8,7 +8,7 @@ import (
 const (
 	cubes       = 50000
 	infinity    = 20000
-	neginfinity = -10
+	neginfinity = 0
 )
 
 var randMemo map[int]int
@@ -19,7 +19,10 @@ func S(k int) int {
 	}
 
 	if k <= 55 {
-		randMemo[k] = (100003 - (200003 * k) + (300007 * k * k * k)) % 1000000
+		kay := int64(k)
+		temp := (100003 - (200003 * kay) + (300007 * kay * kay * kay)) % 1000000
+		if temp < 0{ fmt.Println(k, temp)}
+		randMemo[k] = int(temp)
 		return S(k)
 	}
 
@@ -28,11 +31,27 @@ func S(k int) int {
 }
 
 func sort(indices []int, val map[int]int) []int {
+	if len(indices) == 1 {return indices}
+
+	for i := 0 ; i < len(indices) ; i++{
+		for j:=0 ; j< len(indices) -1 ; j++{
+			if val[indices[j]] > val[indices[j+1]]{
+			indices[j] , indices[j+1] =  indices[j+1], indices[j]
+			}
+		}
+
+	}	
+
+	return indices
+
+
+	/* //mergesort hard on memory?
 	if len(indices) == 1 {
 		return indices
 	}
 	half := len(indices) / 2
 	return merge(sort(indices[:half], val), sort(indices[half:], val), val)
+		*/
 }
 
 //if ab sorted, merge them to return sorted slice
@@ -113,16 +132,26 @@ func find(list []int, f map[int]int, min, max int) (start, end int, works bool) 
 		end = b //at border
 	}
 
+if start > end { // empty
+	return 0,0,false
+}
+
+if min < f[list[start]] && f[list[end]] < max{ // empty
+	return 0,0,false
+}
+
 	return start, end, true
 }
 
 //in place restrict list between a,b
 func restrict(list []int, f map[int]int, min, max int) []int {
+	if len(list)==0{return list}
 	list = sort(list, f)
 	a, b, any := find(list, f, min, max)
 
-	if any {
-		return list[a : b+1]
+	if any  {
+		//fmt.Println("sliced:", a,b)
+		return list[a : b+1] ///ASDFASDFA?????
 	}
 
 	return []int{}
@@ -193,7 +222,7 @@ func eat(x1, x2, y1, y2, z1, z2 int, poss []int) []int {
 		temp[cu] = true
 	}
 
-	fmt.Println("eating")
+	//fmt.Println("eating")
 
 	poss = enumerate(temp)
 	poss = restrict(poss, xstart, x1, x2-1)
@@ -206,7 +235,7 @@ func eat(x1, x2, y1, y2, z1, z2 int, poss []int) []int {
 		ans = append(ans, cu)
 	}
 
-	fmt.Println("eating1")
+	//fmt.Println("eating1")
 
 	poss = enumerate(temp)
 	poss = restrict(poss, xend, x1+1, x2)
@@ -219,7 +248,7 @@ func eat(x1, x2, y1, y2, z1, z2 int, poss []int) []int {
 		ans = append(ans, cu)
 	}
 
-	fmt.Println("eating2")
+	//fmt.Println("eating2")
 
 	poss = enumerate(temp)
 	poss = restrict(poss, ystart, y1, y2-1)
@@ -305,10 +334,12 @@ func bound(input []int) (x1, x2, y1, y2, z1, z2 int) {
 func main() {
 	starttime := time.Now()
 	inits()
+	fmt.Println("initialized")
 
 	ration := make(map[int]bool)
 	for i := 0; i < cubes; i++ {
 		ration[i] = true
+
 	}
 
 	for start, pres := range ration {
@@ -347,6 +378,7 @@ func main() {
 				ration[cu] = false
 				unit = append(unit, cu)
 			}
+	if len(unit) > 1{panic("here")}
 		}
 
 		fmt.Println("unit:", unit)
