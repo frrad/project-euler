@@ -185,6 +185,121 @@ func enumerate(set map[int]bool) []int {
 	return ret
 }
 
+func eat(x1, x2, y1, y2, z1, z2 int, poss []int) []int {
+	temp := make(map[int]bool)
+	ans := make([]int, 0)
+
+	for _, cu := range poss {
+		temp[cu] = true
+	}
+
+	fmt.Println("eating")
+
+	poss = enumerate(temp)
+	poss = restrict(poss, xstart, x1, x2-1)
+	poss = restrict(poss, yend, y1, infinity)
+	poss = restrict(poss, ystart, neginfinity, y2)
+	poss = restrict(poss, zend, z1, infinity)
+	poss = restrict(poss, zstart, neginfinity, z2)
+	for _, cu := range poss {
+		temp[cu] = false
+		ans = append(ans, cu)
+	}
+
+	fmt.Println("eating1")
+
+	poss = enumerate(temp)
+	poss = restrict(poss, xend, x1+1, x2)
+	poss = restrict(poss, yend, y1, infinity)
+	poss = restrict(poss, ystart, neginfinity, y2)
+	poss = restrict(poss, zend, z1, infinity)
+	poss = restrict(poss, zstart, neginfinity, z2)
+	for _, cu := range poss {
+		temp[cu] = false
+		ans = append(ans, cu)
+	}
+
+	fmt.Println("eating2")
+
+	poss = enumerate(temp)
+	poss = restrict(poss, ystart, y1, y2-1)
+	poss = restrict(poss, xend, x1, infinity)
+	poss = restrict(poss, xstart, neginfinity, x2)
+	poss = restrict(poss, zend, z1, infinity)
+	poss = restrict(poss, zstart, neginfinity, z2)
+	for _, cu := range poss {
+		temp[cu] = false
+		ans = append(ans, cu)
+	}
+
+	poss = enumerate(temp)
+	poss = restrict(poss, yend, y1+1, y2)
+	poss = restrict(poss, xend, x1, infinity)
+	poss = restrict(poss, xstart, neginfinity, x2)
+	poss = restrict(poss, zend, z1, infinity)
+	poss = restrict(poss, zstart, neginfinity, z2)
+	for _, cu := range poss {
+		temp[cu] = false
+		ans = append(ans, cu)
+	}
+
+	poss = enumerate(temp)
+	poss = restrict(poss, zstart, z1, z2-1)
+	poss = restrict(poss, xend, x1, infinity)
+	poss = restrict(poss, xstart, neginfinity, x2)
+	poss = restrict(poss, yend, y1, infinity)
+	poss = restrict(poss, ystart, neginfinity, y2)
+	for _, cu := range poss {
+		temp[cu] = false
+		ans = append(ans, cu)
+	}
+
+	poss = enumerate(temp)
+	poss = restrict(poss, zend, z1+1, z2)
+	poss = restrict(poss, xend, x1, infinity)
+	poss = restrict(poss, xstart, neginfinity, x2)
+	poss = restrict(poss, yend, y1, infinity)
+	poss = restrict(poss, ystart, neginfinity, y2)
+	for _, cu := range poss {
+		temp[cu] = false
+		ans = append(ans, cu)
+	}
+
+	fmt.Println("eaten", ans)
+	return ans
+
+}
+
+func bound(input []int) (x1, x2, y1, y2, z1, z2 int) {
+	x1, y1, z1 = infinity, infinity, infinity
+	x2, y2, z2 = neginfinity, neginfinity, neginfinity
+	for _, ind := range input {
+		if x1 > xstart[ind] {
+			x1 = xstart[ind]
+		}
+		if x2 < xend[ind] {
+			x2 = xend[ind]
+		}
+
+		if y1 > ystart[ind] {
+			y1 = ystart[ind]
+		}
+		if y2 < yend[ind] {
+			y2 = yend[ind]
+		}
+
+		if z1 > zstart[ind] {
+			z1 = zstart[ind]
+		}
+		if z2 < zend[ind] {
+			z2 = zend[ind]
+		}
+
+	}
+
+	return
+}
+
 //Idea: Find disjoint figures, then size those using
 //[][][]bool with specified endpoints
 func main() {
@@ -203,7 +318,7 @@ func main() {
 		}
 
 		//If I'm strictly in another cube continue
-		if super(enumerate(ration), start) >= 0 {
+		if super(start, enumerate(ration)) >= 0 {
 			ration[start] = false
 			continue
 		}
@@ -211,6 +326,30 @@ func main() {
 		unit := make([]int, 1)
 		unit[0] = start
 		ration[start] = false
+
+		fmt.Println("START")
+		show(start)
+
+		for {
+			fmt.Println("bounding")
+			x1, x2, y1, y2, z1, z2 := bound(unit)
+			fmt.Println("bounded")
+
+			add := eat(x1, x2, y1, y2, z1, z2, enumerate(ration))
+
+			if len(add) == 0 {
+				break
+			}
+
+			fmt.Println("===")
+			for _, cu := range add {
+				show(cu)
+				ration[cu] = false
+				unit = append(unit, cu)
+			}
+		}
+
+		fmt.Println("unit:", unit)
 
 	}
 
