@@ -20,6 +20,9 @@ const setPath = "../eulerdata/settings.dat"
 const penet = "http://projecteuler.net"
 const probCount = 1000 //some number > #problems
 
+var client = &http.Client{}
+var authenticated bool = false
+
 type myjar struct {
 	jar map[string][]*http.Cookie
 }
@@ -44,7 +47,11 @@ func say(message string, level int) {
 }
 
 //given an authenticated client writes status.html to given path
-func getStatus(client *http.Client) {
+func getStatus() {
+
+	if !authenticated {
+		auth(client)
+	}
 
 	say("Fetching progress page...", 2)
 	resp, err := client.Get(penet + "/progress")
@@ -81,6 +88,8 @@ func auth(client *http.Client) {
 	}
 
 	say("Authenticated", 1)
+	authenticated = true
+
 }
 
 func getData(path string) map[string]string {
@@ -117,7 +126,11 @@ func proccess(a string) []byte {
 }
 
 //takes authenticated client, problem number and solution: submits answer
-func submit(client *http.Client, problem int, solution string) (worked bool, message string) {
+func submit(problem int, solution string) (worked bool, message string) {
+	if !authenticated {
+		auth(client)
+	}
+
 	pname := strconv.Itoa(problem)
 	theURL := penet + "/problem=" + pname
 
@@ -136,7 +149,24 @@ func submit(client *http.Client, problem int, solution string) (worked bool, mes
 
 	capStart := strings.Index(page, "<img src=\"captcha")
 	if capStart == -1 {
-		return false, "Can't find captcha in problem page. Already Submitted?"
+		if strings.Contains(page, "Completed on ") || strings.Contains(page, "Go to the thread for") {
+			say("Problem Already Completed", 1)
+			answerStart := strings.Index(page, "Answer:")
+			trunc := page[answerStart:]
+			aStart := strings.Index(trunc, "<b>")
+			aEnd := strings.Index(trunc, "</b>")
+			correctAnswer := trunc[aStart+3 : aEnd]
+
+			if correctAnswer == solution {
+				return true, ""
+			} else {
+				return false, "Problem Solved: " + correctAnswer
+			}
+
+		} else {
+
+			return false, "Can't find captcha in problem page."
+		}
 	}
 	capEnd := strings.Index(page[capStart+10:], "\"")
 	capURL := page[capStart+10 : capStart+10+capEnd]
@@ -256,32 +286,77 @@ func runProb(n int) (works bool, message, output string) {
 
 }
 
-func fancySubmit(client *http.Client, x int, ans string) bool {
+func fancySubmit(x int, ans string) bool {
 
-	if worked, mess := submit(client, x, ans); worked {
-		say("Correct!", 0)
-		say(penet+"/thread="+strconv.Itoa(x), 1)
+	if known, correct := check(x, ans); !known {
 
-		say("Adding answer to list...", 2)
-		known := getData(settings["knownPath"])
-		known[strconv.Itoa(x)] = ans
-		putData(settings["knownPath"], known)
-		say("Answer added to list.", 1)
+		if worked, mess := submit(x, ans); worked {
+			say("Correct!", 0)
+			say(penet+"/thread="+strconv.Itoa(x), 1)
 
-		getStatus(client)
+			list(x, ans)
 
-		return true
+			getStatus()
+
+			return true
+
+		} else if mess[:14] == "Problem Solved" {
+			say("Wrong answer! (Problem Already Solved)", 0)
+
+			list(x, mess[16:])
+
+		} else {
+			fmt.Println(mess[:14])
+			say(mess, 0)
+		}
 
 	} else {
-		say(mess, 0)
+		say("Answer in list:", 1)
+		if correct {
+			say("Correct!", 0)
+		} else {
+			say("Wrong answer!", 0)
+
+		}
 	}
+
 	return false
+
+}
+
+func list(x int, ans string) {
+	known := getData(settings["knownPath"])
+
+	if _, ok := known[strconv.Itoa(x)]; ok {
+		say("Answer already in list.", 1)
+		return
+	}
+
+	say("Adding answer to list...", 2)
+	known[strconv.Itoa(x)] = ans
+	putData(settings["knownPath"], known)
+	say("Answer added to list.", 1)
+}
+
+func check(x int, ans string) (present, correct bool) {
+	known := getData(settings["knownPath"])
+
+	if rightAnswer, ok := known[strconv.Itoa(x)]; ok {
+		if ans == rightAnswer {
+			return true, true
+		} else {
+			return true, false
+		}
+
+	}
+
+	return false, false
 
 }
 
 func main() {
 
-	client := &http.Client{}
+	client = &http.Client{}
 
 	jar := &myjar{}
 	jar.jar = make(map[string][]*http.Cookie)
@@ -307,8 +382,7 @@ func main() {
 		say("Too many arguments!", 0)
 	} else if len(os.Args) == 2 && os.Args[1] == "R" {
 		say("Updating Status:", 0)
-		auth(client)
-		getStatus(client)
+		getStatus()
 	} else if pnumber, err := strconv.Atoi(os.Args[1]); err == nil {
 		if len(os.Args) == 2 {
 
@@ -320,8 +394,7 @@ func main() {
 					say(mess, 2)
 				}
 
-				auth(client)
-				fancySubmit(client, pnumber, out)
+				fancySubmit(pnumber, out)
 
 			} else {
 				fmt.Println(mess)
@@ -332,8 +405,7 @@ func main() {
 			out := os.Args[2]
 			say("Submitting: "+out, 1)
 
-			auth(client)
-			fancySubmit(client, pnumber, out)
+			fancySubmit(pnumber, out)
 
 		}
 
