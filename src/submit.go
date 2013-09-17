@@ -300,13 +300,12 @@ func fancySubmit(x int, ans string) bool {
 
 			return true
 
-		} else if mess[:14] == "Problem Solved" {
+		} else if len(mess) > 14 && mess[:14] == "Problem Solved" {
 			say("Wrong answer! (Problem Already Solved)", 0)
 
 			list(x, mess[16:])
 
 		} else {
-			fmt.Println(mess[:14])
 			say(mess, 0)
 		}
 
