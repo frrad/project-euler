@@ -6,9 +6,9 @@ import (
 )
 
 const (
-	cubes       = 5000
+	cubes       = 100
 	infinity    = 20000
-	delta       = 50
+	delta       = 200
 	neginfinity = 0
 )
 
@@ -269,44 +269,15 @@ func eat(x int, set map[int]bool) []int {
 
 }
 
-func bound(input []int) (x1, x2, y1, y2, z1, z2 int) {
-	x1, y1, z1 = infinity, infinity, infinity
-	x2, y2, z2 = neginfinity, neginfinity, neginfinity
-	for _, ind := range input {
-		if x1 > xstart[ind] {
-			x1 = xstart[ind]
-		}
-		if x2 < xend[ind] {
-			x2 = xend[ind]
-		}
-
-		if y1 > ystart[ind] {
-			y1 = ystart[ind]
-		}
-		if y2 < yend[ind] {
-			y2 = yend[ind]
-		}
-
-		if z1 > zstart[ind] {
-			z1 = zstart[ind]
-		}
-		if z2 < zend[ind] {
-			z2 = zend[ind]
-		}
-
-	}
-
-	return
-}
-
 func cutx(list []int, cutposition, index int) (added int) {
+	fmt.Print("(*Snip...")
 	temp := restrict(list, xstart, neginfinity, cutposition-1)
 	temp = restrict(temp, xend, cutposition+1, infinity)
 
 	for _, box := range temp {
 
-		xstart[index] = cutposition
-		xend[index] = xend[box]
+		xstart[index] = xstart[box]
+		xend[index] = cutposition
 
 		ystart[index] = ystart[box]
 		yend[index] = yend[box]
@@ -314,18 +285,17 @@ func cutx(list []int, cutposition, index int) (added int) {
 		zstart[index] = zstart[box]
 		zend[index] = zend[box]
 
-		vol[index] = int(size([]int{index})) //silly use
-		show(index)
-		fmt.Println(vol[index])
+		vol[index] = int(size([]int{index}))
 
-		xend[box] = cutposition
-		vol[box] = int(size([]int{box})) //silly use
-		show(box)
+		xstart[box] = cutposition
+		vol[box] = int(size([]int{box}))
 
 		added++
 		index++
 
 	}
+
+	fmt.Print("\t...Snap*)\n")
 
 	return
 }
@@ -356,41 +326,20 @@ func findVolume(volsort []int) (volume int64) {
 	}
 
 	for _, start := range volsort {
-		//		fmt.Println(i, "/", len(ration))
 
-		//If this cube has been done continue
 		if !ration[start] {
 			continue
 		}
 
 		unit := eat(start, ration)
 
-		if len(unit) == 1 {
-			volume += int64(vol[start])
-
-		}
-
-		if len(unit) > 1 {
-
-			fmt.Println("\nSTART")
-			show(start)
-			fmt.Println("===")
-			for _, cu := range unit {
-				show(cu)
-			}
-
-			fmt.Println("size:", size(unit))
-			volume += size(unit)
-
-		}
+		volume += size(unit)
 
 	}
 
 	return volume
 }
 
-//Idea: Find disjoint figures, then size those using
-//[][][]bool with specified endpoints
 func main() {
 	starttime := time.Now()
 
@@ -402,31 +351,33 @@ func main() {
 		ration[i] = true
 	}
 
-	end := cubes
-	for cuton := delta; cuton < infinity; cuton += delta {
-		start := end
-		end = start + cutx(enumerate(ration), cuton, start)
-		for i := start; i < end; i++ {
-			ration[i] = true
-		}
-	}
-
-	//fmt.Println(size(enumerate(ration)))
-
 	volume := int64(0)
 
-	volsort := enumerate(ration)
+	end := cubes
+	for cuton := delta; cuton < infinity; cuton += delta {
+		fmt.Println(cuton)
+		start := end
+		end = start + cutx(enumerate(ration), cuton, start)
 
-	for i := 0; i < infinity; i += delta {
+		piece := make([]int, 0)
 
-		temp := restrict(volsort, xstart, i, i+delta)
-		temp = restrict(temp, xend, i, i+delta)
+		for i := start; i < end; i++ {
+			piece = append(piece, i)
+			ration[i] = true
+		}
+
+		temp := enumerate(ration)
+		temp = restrict(temp, xend, neginfinity, cuton)
+
+		fmt.Println("rest")
+		for _, box := range temp {
+			delete(ration, box)
+		}
 
 		volume += findVolume(temp)
-
 	}
 
-	fmt.Println("Volume:", volume)
+	fmt.Println(volume)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
