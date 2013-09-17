@@ -6,7 +6,7 @@ import (
 )
 
 const (
-	cubes       = 100
+	cubes       = 50000
 	infinity    = 20000
 	delta       = 200
 	neginfinity = 0
@@ -69,10 +69,10 @@ func find(list []int, f map[int]int, min, max int) (start, end int, works bool) 
 		}
 	}
 
-	if f[list[a]] < min { ///usually
+	if f[list[a]] < min {
 		start = b
 	} else {
-		start = a //at border
+		start = a
 	}
 
 	a, b = 0, len(list)-1
@@ -89,24 +89,23 @@ func find(list []int, f map[int]int, min, max int) (start, end int, works bool) 
 		}
 	}
 
-	if f[list[b]] > max { ///usually
+	if f[list[b]] > max {
 		end = a
 	} else {
-		end = b //at border
+		end = b
 	}
 
-	if start > end { // empty
+	if start > end {
 		return 0, 0, false
 	}
 
-	if f[list[start]] < min && max < f[list[end]] { // empty
+	if f[list[start]] < min && max < f[list[end]] {
 		return 0, 0, false
 	}
 
 	return start, end, true
 }
 
-//in place restrict list between a,b
 func restrict(list []int, f map[int]int, min, max int) []int {
 	if len(list) == 0 {
 		return list
@@ -116,12 +115,9 @@ func restrict(list []int, f map[int]int, min, max int) []int {
 	a, b, any := find(list, f, min, max)
 
 	if any {
-		//fmt.Println("sliced:", a,b)
-		return list[a : b+1] ///ASDFASDFA?????
+		return list[a : b+1]
 	}
-
 	return []int{}
-
 }
 
 func size(collection []int) int64 {
@@ -165,8 +161,6 @@ func size(collection []int) int64 {
 
 	}
 
-	//fmt.Println(state)
-
 	volume := int64(0)
 
 	for _, cu := range collection {
@@ -178,7 +172,7 @@ func size(collection []int) int64 {
 		for i := x1; i < x2; i++ {
 			for j := y1; j < y2; j++ {
 				for k := z1; k < z2; k++ {
-					//fmt.Println(len(xlist), len(ylist), len(zlist), i, j, k)
+
 					if !state[i][j][k] {
 						state[i][j][k] = true
 						volume += int64(xlist[i+1]-xlist[i]) * int64(ylist[j+1]-ylist[j]) * int64(zlist[k+1]-zlist[k])
@@ -204,13 +198,11 @@ func inits() {
 		x, y, z := S(6*i-5)%10000, S(6*i-4)%10000, S(6*i-3)%10000
 		dx, dy, dz := 1+(S(6*i-2)%399), 1+(S(6*i-1)%399), 1+(S(6*i)%399)
 
-		//After init, everything is zero indexed
 		xstart[i-1], xend[i-1] = x, x+dx
 		ystart[i-1], yend[i-1] = y, y+dy
 		zstart[i-1], zend[i-1] = z, z+dz
 		vol[i-1] = dx * dy * dz
 
-		//fmt.Println(x, y, z, "\t", dx, dy, dz)
 	}
 }
 
@@ -221,16 +213,6 @@ func enumerate(set map[int]bool) []int {
 	for key, val := range set {
 		if val {
 			ret = append(ret, key)
-		}
-	}
-	return ret
-}
-
-func renumerate(set map[int]bool, order []int) []int {
-	ret := make([]int, 0)
-	for _, val := range order {
-		if set[val] {
-			ret = append(ret, val)
 		}
 	}
 	return ret
@@ -261,8 +243,6 @@ func eat(x int, set map[int]bool) []int {
 			delete(set, cube)
 		}
 
-		//	fmt.Println("(", i, "/", len(list), ")")
-
 	}
 
 	return list
@@ -270,7 +250,7 @@ func eat(x int, set map[int]bool) []int {
 }
 
 func cutx(list []int, cutposition, index int) (added int) {
-	fmt.Print("(*Snip...")
+
 	temp := restrict(list, xstart, neginfinity, cutposition-1)
 	temp = restrict(temp, xend, cutposition+1, infinity)
 
@@ -295,15 +275,13 @@ func cutx(list []int, cutposition, index int) (added int) {
 
 	}
 
-	fmt.Print("\t...Snap*)\n")
-
 	return
 }
 
-//in-place quicksort
 func partition(list []int, f map[int]int) int {
-	pivotValue := f[list[len(list)/2]]                                          // Pivot on the middle
-	list[len(list)-1], list[len(list)/2] = list[len(list)/2], list[len(list)-1] // put pivot at end for safekeeping
+	pivotValue := f[list[len(list)/2]]
+
+	list[len(list)-1], list[len(list)/2] = list[len(list)/2], list[len(list)-1]
 
 	storeIndex := 0
 	for i := 0; i < len(list)-1; i++ {
@@ -369,7 +347,6 @@ func main() {
 		temp := enumerate(ration)
 		temp = restrict(temp, xend, neginfinity, cuton)
 
-		fmt.Println("rest")
 		for _, box := range temp {
 			delete(ration, box)
 		}
