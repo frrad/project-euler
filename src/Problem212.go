@@ -22,9 +22,6 @@ func S(k int) int {
 	if k <= 55 {
 		kay := int64(k)
 		temp := (100003 - (200003 * kay) + (300007 * kay * kay * kay)) % 1000000
-		if temp < 0 {
-			fmt.Println(k, temp)
-		}
 		randMemo[k] = int(temp)
 		return S(k)
 	}
