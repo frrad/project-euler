@@ -6,8 +6,9 @@ import (
 )
 
 const (
-	cubes       = 500
+	cubes       = 5000
 	infinity    = 20000
+	delta       = 50
 	neginfinity = 0
 )
 
@@ -235,17 +236,36 @@ func renumerate(set map[int]bool, order []int) []int {
 	return ret
 }
 
-func eat(x1, x2, y1, y2, z1, z2 int, poss []int) []int {
-	poss = restrict(poss, xstart, neginfinity, x2-1)
-	poss = restrict(poss, xend, x1+1, infinity)
+func eat(x int, set map[int]bool) []int {
 
-	poss = restrict(poss, yend, y1+1, infinity)
-	poss = restrict(poss, ystart, neginfinity, y2-1)
+	list := make([]int, 1)
+	list[0] = x
+	delete(set, x)
 
-	poss = restrict(poss, zend, z1+1, infinity)
-	poss = restrict(poss, zstart, neginfinity, z2-1)
+	for i := 0; i < len(list); i++ {
+		cu := list[i]
 
-	return poss
+		poss := enumerate(set)
+
+		poss = restrict(poss, xstart, neginfinity, xend[cu]-1)
+		poss = restrict(poss, xend, xstart[cu]+1, infinity)
+
+		poss = restrict(poss, yend, ystart[cu]+1, infinity)
+		poss = restrict(poss, ystart, neginfinity, yend[cu]-1)
+
+		poss = restrict(poss, zend, zstart[cu]+1, infinity)
+		poss = restrict(poss, zstart, neginfinity, zend[cu]-1)
+
+		for _, cube := range poss {
+			list = append(list, cube)
+			delete(set, cube)
+		}
+
+		//	fmt.Println("(", i, "/", len(list), ")")
+
+	}
+
+	return list
 
 }
 
@@ -279,6 +299,37 @@ func bound(input []int) (x1, x2, y1, y2, z1, z2 int) {
 	return
 }
 
+func cutx(list []int, cutposition, index int) (added int) {
+	temp := restrict(list, xstart, neginfinity, cutposition-1)
+	temp = restrict(temp, xend, cutposition+1, infinity)
+
+	for _, box := range temp {
+
+		xstart[index] = cutposition
+		xend[index] = xend[box]
+
+		ystart[index] = ystart[box]
+		yend[index] = yend[box]
+
+		zstart[index] = zstart[box]
+		zend[index] = zend[box]
+
+		vol[index] = int(size([]int{index})) //silly use
+		show(index)
+		fmt.Println(vol[index])
+
+		xend[box] = cutposition
+		vol[box] = int(size([]int{box})) //silly use
+		show(box)
+
+		added++
+		index++
+
+	}
+
+	return
+}
+
 //in-place quicksort
 func partition(list []int, f map[int]int) int {
 	pivotValue := f[list[len(list)/2]]                                          // Pivot on the middle
@@ -297,59 +348,22 @@ func partition(list []int, f map[int]int) int {
 	return storeIndex
 }
 
-//Idea: Find disjoint figures, then size those using
-//[][][]bool with specified endpoints
-func main() {
-	starttime := time.Now()
-
-	inits()
-	fmt.Println("initialized")
-
+func findVolume(volsort []int) (volume int64) {
 	ration := make(map[int]bool)
-	for i := 0; i < cubes; i++ {
-		ration[i] = true
 
+	for _, cube := range volsort {
+		ration[cube] = true
 	}
 
-	volume := int64(0)
-
-	fmt.Println(size(enumerate(ration)))
-
-	volsort := enumerate(ration)
-	sort(volsort, vol)
-	fmt.Println("built volume sort")
-	xssort := enumerate(ration)
-	sort(xssort, xstart)
-	fmt.Println("built xs sort")
-
-	for i, start := range volsort {
-		fmt.Println(i, "/", cubes)
+	for _, start := range volsort {
+		//		fmt.Println(i, "/", len(ration))
 
 		//If this cube has been done continue
 		if !ration[start] {
 			continue
 		}
 
-		unit := make([]int, 1)
-		unit[0] = start
-		ration[start] = false
-
-		for {
-			x1, x2, y1, y2, z1, z2 := bound(unit)
-
-			add := eat(x1, x2, y1, y2, z1, z2, renumerate(ration, xssort))
-
-			if len(add) == 0 {
-
-				break
-			}
-
-			for _, cu := range add {
-				delete(ration, cu)
-				unit = append(unit, cu)
-			}
-
-		}
+		unit := eat(start, ration)
 
 		if len(unit) == 1 {
 			volume += int64(vol[start])
@@ -369,6 +383,46 @@ func main() {
 			volume += size(unit)
 
 		}
+
+	}
+
+	return volume
+}
+
+//Idea: Find disjoint figures, then size those using
+//[][][]bool with specified endpoints
+func main() {
+	starttime := time.Now()
+
+	inits()
+	fmt.Println("initialized")
+
+	ration := make(map[int]bool)
+	for i := 0; i < cubes; i++ {
+		ration[i] = true
+	}
+
+	end := cubes
+	for cuton := delta; cuton < infinity; cuton += delta {
+		start := end
+		end = start + cutx(enumerate(ration), cuton, start)
+		for i := start; i < end; i++ {
+			ration[i] = true
+		}
+	}
+
+	//fmt.Println(size(enumerate(ration)))
+
+	volume := int64(0)
+
+	volsort := enumerate(ration)
+
+	for i := 0; i < infinity; i += delta {
+
+		temp := restrict(volsort, xstart, i, i+delta)
+		temp = restrict(temp, xend, i, i+delta)
+
+		volume += findVolume(temp)
 
 	}
 
