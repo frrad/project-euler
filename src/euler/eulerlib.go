@@ -112,9 +112,8 @@ func SortLInts(list []int64) []int64 {
 	return list
 }
 
-
-func SortUInt64( list []uint64 ) []uint64 {
-		for j := 0; j < len(list); j++ {
+func SortUInt64(list []uint64) []uint64 {
+	for j := 0; j < len(list); j++ {
 
 		for i := 0; i < len(list)-1; i++ {
 			if list[i] > list[i+1] {
@@ -126,8 +125,6 @@ func SortUInt64( list []uint64 ) []uint64 {
 	}
 	return list
 }
-
-
 
 func SortInt(input int64) int64 {
 
@@ -154,7 +151,7 @@ func IsPandigital(n int64) bool {
 	return output == SortInt(n)
 }
 
-func UInt64Prime( n uint64) uint64 {
+func UInt64Prime(n uint64) uint64 {
 	return uint64(Prime(int64(n)))
 }
 
@@ -190,18 +187,6 @@ func Exp2(n int) int64 {
 	for i := 0; i < n; i++ {
 		answer *= 2
 	}
-	return answer
-}
-
-func XOR(a byte, b byte) (answer byte) {
-	first := a
-	second := b
-	for i := 0; i < 8; i++ {
-		answer += byte(Exp2(i)) * ((first%2 + second%2) % 2)
-		first = (first - first%2) / 2
-		second = (second - second%2) / 2
-	}
-
 	return answer
 }
 
@@ -310,7 +295,7 @@ func Max(m int64, n int64) int64 {
 	return m
 }
 
-//Euclid's Algorithm 
+//Euclid's Algorithm
 //(Recursive implementation eats memory)
 func GCD(n int64, m int64) int64 {
 	if n == 0 {
@@ -401,8 +386,8 @@ func IsStringPalindrome(n string) bool {
 	return false
 }
 
-func UInt64Exp(a , b uint64) uint64 {
-		if b == 0 {
+func UInt64Exp(a, b uint64) uint64 {
+	if b == 0 {
 		return 1
 	}
 	if b == 1 {
@@ -417,13 +402,13 @@ func UInt64Exp(a , b uint64) uint64 {
 
 func IntExp(a int64, b int64) int64 {
 	if a > 0 {
-		return int64 (UInt64Exp(uint64(a), uint64(b)  ))
+		return int64(UInt64Exp(uint64(a), uint64(b)))
 	}
-	if a < 0 && b%2 == 0  {
-		return IntExp(-1 * a , b)
+	if a < 0 && b%2 == 0 {
+		return IntExp(-1*a, b)
 	}
 
-	return -1 * IntExp(-1 * a , b)
+	return -1 * IntExp(-1*a, b)
 
 }
 
