@@ -32,6 +32,46 @@ func Factor(n int64) []int64 {
 	return answer
 }
 
+//ax + by = gcd(a,b)
+func ExtendedEuclidean(a, b int64) (x, y int64) {
+	x, lastx := int64(0), int64(1)
+	y, lasty := int64(1), int64(0)
+	for b != int64(0) {
+		quotient := a / b
+		a, b = b, a%b
+		x, lastx = lastx-quotient*x, x
+		y, lasty = lasty-quotient*y, y
+	}
+	return lastx, lasty
+}
+
+//what's X^-1 mod n? (assuming of course x, n coprime)
+func InverseMod(x, n int64) int64 {
+	ans, _ := ExtendedEuclidean(x, n)
+	return ans
+}
+
+//find a number equal to a mod n. N are assumed to be coprime
+func ChineseRemainder(a, n []int64) int64 {
+	N := int64(1)
+	for _, en := range n {
+		N *= en
+	}
+
+	ans := int64(0)
+	for i := range a {
+		summand := a[i]
+		summand *= N
+		summand /= n[i]
+		summand *= InverseMod(N/n[i], n[i])
+
+		ans += summand
+	}
+
+	return ans
+
+}
+
 //an ordered list of prime factors, together with their degrees
 func Factors(n int64) [][2]int64 {
 	factorList := Factor(n)
@@ -139,7 +179,7 @@ func PrimeCache(n int64) {
 }
 
 //if p is the nth prime
-func PrimeN(p int64)  int64 {
+func PrimeN(p int64) int64 {
 	if !IsPrime(p) {
 		return -1
 	}
