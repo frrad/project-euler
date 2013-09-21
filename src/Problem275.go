@@ -5,7 +5,12 @@ import (
 	"time"
 )
 
-const top = 1 << 12
+const (
+	order = 18
+	top   = 1 << order
+)
+
+var supmemo map[int][]int
 
 //a supports b
 func supports(a, b int) bool {
@@ -40,6 +45,13 @@ func print(an int) {
 	fmt.Print("\n")
 }
 
+func com(dist []int) (ans int) {
+	for i, line := range dist {
+		ans += count(line) * i
+	}
+	return
+}
+
 func count(an int) (bits int) {
 
 	for an != 0 {
@@ -49,69 +61,79 @@ func count(an int) (bits int) {
 	return
 }
 
+func sups(an int) []int {
+
+	if ans, ok := supmemo[an]; ok {
+		return ans
+	}
+
+	ans := make([]int, 0)
+	for i := 0; i < top; i++ {
+		if supports(an, i) {
+			ans = append(ans, i)
+		}
+	}
+
+	supmemo[an] = ans
+	return ans
+
+}
+
 func main() {
 	starttime := time.Now()
-	sups := make([][]int, top)
 
-	for i := 0; i < top; i++ {
+	supmemo = make(map[int][]int)
 
-		for j := 0; j < top; j++ {
+	print(top - 1)
 
-			if supports(i, j) {
-				sups[i] = append(sups[i], j)
-			}
-		}
-		fmt.Println(i)
-	}
+	//how tall above plinth
+	balance := uint(2)
 
-	sequences := [][][]int{[][]int{[]int{1<<6 - 1}}}
+	seq := [][][]int{[][]int{[]int{1<<balance - 1}}}
 
-	test := 12
+	blocks := 2
 
-	for length := 1; length <= test; length++ {
-		sequences = append(sequences, make([][]int, 0))
+	for depth := 2; depth < 4 || len(seq[depth-3]) != len(seq[depth-2]); depth++ {
+		seq = append(seq, [][]int{})
+		short := seq[depth-2]
+		for _, list := range short {
+			trailing := list[depth-2]
 
-		for _, subseq := range sequences[length-1] {
-
-			//fmt.Println(sequences)
-			trailing := subseq[length-1]
-
-			if trailing == 0 {
-				continue
+			blocksUsed := 0
+			for _, line := range list {
+				blocksUsed += count(line)
 			}
 
-			blocks := 0
-
-			for _, line := range subseq {
-				blocks += count(line)
-			}
-
-			for _, options := range sups[trailing] {
-
-				if count(options)+blocks <= 18 {
-					adder := make([]int, length+1)
-					copy(adder[:length], subseq)
-					adder[length] = options
-					sequences[length] = append(sequences[length], adder)
-
+			for _, possible := range sups(trailing) {
+				if count(possible)+blocksUsed-int(balance) <= blocks && !((count(possible)+blocksUsed-int(balance) < blocks) && possible == 0) {
+					longer := make([]int, depth)
+					copy(longer[:depth-1], list)
+					longer[depth-1] = possible
+					seq[depth-1] = append(seq[depth-1], longer)
 				}
-
 			}
 
+			//fmt.Println(trailing)
+
 		}
-
 	}
 
-	for _, size := range sequences {
-		fmt.Println(len(size))
-	}
+	list := seq[len(seq)-1]
 
-	for _, sequence := range sequences[5] {
-		for _, line := range sequence {
+	for _, config := range list {
+		fmt.Println("COM:", com(config))
+		for _, line := range config {
 			print(line)
 		}
-		fmt.Println("====")
+		fmt.Println("======")
 	}
+
+	for _, butts := range seq {
+
+		fmt.Println(len(butts))
+	}
+
+	//fmt.Println(seq)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 
