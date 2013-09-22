@@ -2,17 +2,22 @@ package main
 
 import (
 	"fmt"
-	"strconv"
+
 	"time"
 )
 
 func digits(n int) int {
-	str := strconv.Itoa(n)
+
 	sum := 0
-	for i := 0; i < len(str); i++ {
-		x, _ := strconv.Atoi(str[i : i+1])
+
+	for n > 0 {
+
+		x := n % 10
+		n /= 10
+
 		sum += x * x * x * x * x
 	}
+
 	return sum
 }
 
