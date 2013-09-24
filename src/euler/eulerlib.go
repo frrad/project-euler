@@ -204,34 +204,6 @@ func DistinctNumber(list []int64) int {
 
 }
 
-func IsPrime(n int64) bool {
-
-	if n == 1 {
-		return false
-	}
-
-	end := int64(math.Sqrt(float64(n)))
-
-	//If we start computing beyond the table, this is stupid
-	for i := int64(1); Prime(i) <= end && i < primeTableLength; i++ {
-		if n%Prime(i) == 0 {
-			return false
-		}
-	}
-
-	//If we need to pass the end of the prime table brute force
-	if end > lastPrime {
-		for i := int64(lastPrime); i <= end; i++ {
-			if n%i == 0 {
-				return false
-			}
-		}
-
-	}
-
-	return true
-}
-
 func ArePermutations(a int64, b int64) bool {
 	A := strconv.FormatInt(a, 10)
 	B := strconv.FormatInt(b, 10)

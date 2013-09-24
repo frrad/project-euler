@@ -2,6 +2,18 @@ package euler
 
 import "math"
 
+const (
+	primeTableLength = 50000000 //+1!!!!!!!!!!!
+	//lastPrime = Prime[primeTableLength - 1]
+	lastPrime          = 982451629
+	totientTableLength = 100000
+)
+
+var primeTable [primeTableLength]int64
+var primepilist [primeTableLength]int64
+var totientTable [totientTableLength]int64
+var factorialtable = make(map[int64]int64)
+
 func Divisors(n int64) int64 {
 	factors := Factors(n)
 	div := int64(1)
@@ -86,8 +98,6 @@ func Factors(n int64) [][2]int64 {
 	return factors
 }
 
-var factorialtable = make(map[int64]int64)
-
 func Factorial(n int64) int64 {
 	if n == 0 {
 		return 1
@@ -108,17 +118,6 @@ func IntSqrt(n int64) (sqrt int64, square bool) {
 	square = sqrt*sqrt == n
 	return
 }
-
-const (
-	primeTableLength = 10000000 //+1!!!!!!!!!!!
-	//lastPrime = Prime[primeTableLength - 1]
-	lastPrime          = 15485857
-	totientTableLength = 100000
-)
-
-var primeTable [primeTableLength]int64
-var primepilist [primeTableLength]int64
-var totientTable [totientTableLength]int64
 
 //number of primes less than or equal to n
 func PrimePi(n int64) int64 {
@@ -184,4 +183,32 @@ func PrimeN(p int64) int64 {
 		return -1
 	}
 	return PrimePi(p)
+}
+
+func IsPrime(n int64) bool {
+
+	if n == 1 {
+		return false
+	}
+
+	end := int64(math.Sqrt(float64(n)))
+
+	//If we start computing beyond the table, this is stupid
+	for i := int64(1); Prime(i) <= end && i < primeTableLength; i++ {
+		if n%Prime(i) == 0 {
+			return false
+		}
+	}
+
+	//If we need to pass the end of the prime table brute force
+	if end > lastPrime {
+		for i := int64(lastPrime); i <= end; i++ {
+			if n%i == 0 {
+				return false
+			}
+		}
+
+	}
+
+	return true
 }
