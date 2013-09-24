@@ -155,33 +155,6 @@ func UInt64Prime(n uint64) uint64 {
 	return uint64(Prime(int64(n)))
 }
 
-func Prime(n int64) int64 {
-
-	if n < 1 {
-		return 0
-	}
-
-	primeTable[1] = 2
-	primeTable[2] = 3
-
-	if n < primeTableLength && primeTable[n] != 0 {
-		return primeTable[n]
-	}
-
-	i := Prime(n-1) + 1
-
-	for !IsPrime(i) {
-		i++
-	}
-
-	primepilist[i] = n
-
-	if n < primeTableLength {
-		primeTable[n] = i
-	}
-	return i
-}
-
 func Exp2(n int) int64 {
 	answer := int64(1)
 	for i := 0; i < n; i++ {
