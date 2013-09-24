@@ -6,47 +6,58 @@ import (
 	"time"
 )
 
-//quantity of admissable numbers \leq n with top prime p or below
-//convention : 1 is not admissable
-func admissable(n, p int64) int64 {
-	if p == 1 && n >= 2 {
-		return 2
-	}else if p== 1 && n < 2 {
-		return 1
+const (
+	notExceeding = 100000000
+	half         = notExceeding / 2
+)
+
+func validate(n int64) bool {
+
+	for d := int64(2); d*d <= n; d++ {
+		if n%d == 0 && !euler.IsPrime(d+(n/d)) {
+			return false
+		}
 	}
-	answer := admissable(n, p-1) 
-	if euler.Prime(p) <= n {
-		answer += admissable(n/ euler.Prime(p) , p-1)
-	}
-	return answer
+
+	return true
 }
 
 func main() {
 	starttime := time.Now()
 
-	a := 369000
-	n := uint64(128)
+	euler.PrimeCache(half)
+	fmt.Println("Built Prime Cache...")
 
-	x := euler.IntPNum(a);
-	
+	check := []int64{1}
 
-for i := uint64(0); i < (1+x.Divisors())/2; i++ {
-	
-	d := x.Divisor(i)
-	q := euler.Quotient(x,d)
-	fmt.Println(a, d.UInt64(),q.UInt64())
+	for i := int64(1); i <= euler.PrimePi(half); i++ {
+		prime := euler.Prime(i)
+		candidate := (prime - 2) * 2
+		if euler.IsPrime(candidate + 1) {
+			check = append(check, candidate)
+		}
+	}
 
-}
+	// for i := 0; i < 10; i++ {
+	// 	fmt.Println(check[i])
+	// }
 
+	fmt.Printf("There are %d initial candidates.\n", len(check))
 
-	fmt.Println(a, "mod", n, x.Mod(n))
+	total := int64(0)
 
-	//Candidates can't be divisible by the square of a prime!
+	for i, can := range check {
+		if validate(can) {
+			// fmt.Println(can)
+			total += can
+		}
+		if i%10000 == 0 {
+			fmt.Printf("Checked %d/%d\n", i, len(check))
+		}
+	}
 
-
-
+	fmt.Println(total)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
-
 
 }
