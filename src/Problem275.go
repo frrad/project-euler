@@ -6,8 +6,9 @@ import (
 )
 
 const (
-	order = 18
-	top   = 1 << order
+	order    = 6
+	top      = 1 << order
+	infinity = 99999999
 )
 
 var supmemo map[int][]int
@@ -68,7 +69,7 @@ func sups(an int) []int {
 	}
 
 	ans := make([]int, 0)
-	for i := 0; i < top; i++ {
+	for i := 0; i <= top; i++ {
 		if supports(an, i) {
 			ans = append(ans, i)
 		}
@@ -83,57 +84,94 @@ func main() {
 	starttime := time.Now()
 
 	supmemo = make(map[int][]int)
-
-	print(top - 1)
+	trackMemo := make(map[[3]int]int)
 
 	//how tall above plinth
-	balance := uint(2)
 
-	seq := [][][]int{[][]int{[]int{1<<balance - 1}}}
+	for balance := uint(1); balance <= uint(order); balance++ {
 
-	blocks := 2
+		for blocks := 0; blocks <= order-int(balance); blocks++ {
 
-	for depth := 2; depth < 4 || len(seq[depth-3]) != len(seq[depth-2]); depth++ {
-		seq = append(seq, [][]int{})
-		short := seq[depth-2]
-		for _, list := range short {
-			trailing := list[depth-2]
-
-			blocksUsed := 0
-			for _, line := range list {
-				blocksUsed += count(line)
-			}
-
-			for _, possible := range sups(trailing) {
-				if count(possible)+blocksUsed-int(balance) <= blocks && !((count(possible)+blocksUsed-int(balance) < blocks) && possible == 0) {
-					longer := make([]int, depth)
-					copy(longer[:depth-1], list)
-					longer[depth-1] = possible
-					seq[depth-1] = append(seq[depth-1], longer)
+			minCOM := 0
+			maxCOM := infinity
+			dual := order - blocks - int(balance)
+			if blocks > dual {
+				for key, _ := range trackMemo {
+					if key[0] == int(balance) && key[1] == dual {
+						COM := key[2]
+						if COM < minCOM {
+							minCOM = COM
+						}
+						if COM > maxCOM {
+							maxCOM = COM
+						}
+					}
 				}
 			}
 
-			//fmt.Println(trailing)
+			seq := [][][]int{[][]int{[]int{1<<balance - 1}}}
+
+			for depth := 2; depth < 4 || len(seq[depth-3]) != len(seq[depth-2]); depth++ {
+				seq = append(seq, [][]int{})
+				short := seq[depth-2]
+				for _, list := range short {
+					trailing := list[depth-2]
+
+					blocksUsed := 0
+					for _, line := range list {
+						blocksUsed += count(line)
+					}
+
+					for _, possible := range sups(trailing) {
+						if bAdd := count(possible); bAdd+blocksUsed-int(balance) <= blocks && !(bAdd+blocksUsed-int(balance) < blocks && possible == 0) {
+							longer := make([]int, depth)
+							copy(longer[:depth-1], list)
+							longer[depth-1] = possible
+							if com(longer) <= maxCOM {
+								seq[depth-1] = append(seq[depth-1], longer)
+
+							}
+
+						}
+					}
+
+				}
+			}
+
+			list := seq[len(seq)-1]
+
+			for _, config := range list {
+
+				trackMemo[[3]int{int(balance), blocks, com(config)}]++
+			}
 
 		}
 	}
 
-	list := seq[len(seq)-1]
+	//fmt.Println(trackMemo)
 
-	for _, config := range list {
-		fmt.Println("COM:", com(config))
-		for _, line := range config {
-			print(line)
+	total := 0
+	for key, multiplicity := range trackMemo {
+		bal, block, com := key[0], key[1], key[2]
+		dual := order - bal - block
+		if dual < block {
+			tweak := multiplicity * trackMemo[[3]int{bal, dual, com}]
+			total += tweak
+			if tweak != 0 {
+				fmt.Printf("Bal: %d Blocks: %d COM: %d => %d\n", bal, block, com, tweak)
+				fmt.Println(multiplicity)
+			}
 		}
-		fmt.Println("======")
+		if dual == block {
+			tweak := multiplicity * (multiplicity + 1) / 2
+			total += tweak
+			if tweak != 0 {
+				fmt.Printf("Bal: %d Blocks: %d COM: %d => %d\n", bal, block, com, tweak)
+			}
+		}
 	}
 
-	for _, butts := range seq {
-
-		fmt.Println(len(butts))
-	}
-
-	//fmt.Println(seq)
+	fmt.Println(total)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 
