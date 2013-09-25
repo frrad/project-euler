@@ -5,181 +5,127 @@ import (
 	"time"
 )
 
-func numberize(row []bool) (ans uint64) {
-	for i := 0; i < len(row); i++ {
-		if row[i] {
-			ans += 1 << uint(i)
-		}
-	}
-	return
-}
+const (
+	mod = 1000000033
+	N   = 100
+)
 
-func deNumberize(x uint64, lgth int) (slice []bool) {
-	slice = make([]bool, lgth)
-	for i := 0; i < lgth; i++ {
-		if x&1 == 1 {
-			slice[i] = true
-		}
-		x >>= 1
-	}
-	return
-}
+var chooseMem, memo map[[2]int]int64
+var twoMem map[int]int64
 
-func show(state [][]bool) {
-	for i := 0; i < len(state); i++ {
-		for j := 0; j < len(state[0]); j++ {
-			if state[i][j] {
-				fmt.Print("X")
-			} else {
-				fmt.Print(" ")
-			}
-		}
-		fmt.Print("\n")
+//This is the T of http://oeis.org/A227322
+func R(n, m int) (ans int64) {
+	if n < m {
+		return R(m, n)
 	}
 
-}
-
-func count(state [][]bool) (total int) {
-	for i := 0; i < len(state); i++ {
-		for j := 0; j < len(state[0]); j++ {
-			if state[i][j] {
-				total++
-			}
-		}
-	}
-	return
-}
-
-func evolve(currentState [][]bool) [][]bool {
-
-	x := len(currentState)
-	y := len(currentState[0])
-
-	state := make([][]bool, x)
-	for i := 0; i < x; i++ {
-		line := make([]bool, y)
-		copy(line, currentState[i])
-		state[i] = line
+	if n == 0 {
+		return 1
 	}
 
-	oldCount, newCount := -1, count(state)
-	for oldCount < newCount {
-		state = evolveH(state)
-		state = transpose(state)
-		state = evolveH(state)
-		state = transpose(state)
-		oldCount, newCount = newCount, count(state)
+	if ans, ok := memo[[2]int{n, m}]; ok {
+		return ans
 	}
 
-	return state
-}
+	if !(n == 1 && m == 0) {
+		ans += inter(1, 0, n, m)
+		ans %= mod
+	}
 
-func evolveH(state [][]bool) [][]bool {
-	oldCount, newCount := -1, count(state)
+	for i := 1; i <= n; i++ {
+		for j := 1; j <= m; j++ {
 
-	for oldCount < newCount {
+			if !(i == n && j == m) {
+				ans += inter(i, j, n, m)
+				ans %= mod
 
-		list := numberizeState(state)
-
-		for j := 0; j < len(list)-1; j++ {
-
-			if list[j]&list[j+1] != 0 {
-				list[j] = list[j] | list[j+1]
-				list[j+1] = list[j]
 			}
 
 		}
-
-		state = deNumberizeMatrix(list, len(state[0]))
-
-		oldCount, newCount = newCount, count(state)
-
 	}
 
-	return state
-}
+	big := twoPow(n * m)
+	ans = big - ans
 
-func transpose(state [][]bool) (transp [][]bool) {
-	x, y := len(state), len(state[0])
-
-	transp = make([][]bool, y)
-
-	for i := 0; i < y; i++ {
-		transp[i] = make([]bool, x)
-		for j := 0; j < x; j++ {
-			transp[i][j] = state[j][i]
-		}
-
+	for ans < 0 {
+		ans += mod
 	}
 
-	return
+	memo[[2]int{n, m}] = ans
+	return R(n, m)
 
 }
 
-func numberizeState(state [][]bool) []uint64 {
-	x := len(state)
-
-	ret := make([]uint64, x)
-
-	for i := 0; i < x; i++ {
-		ret[i] = numberize(state[i])
+func twoPow(an int) int64 {
+	if an == 0 {
+		return 1
 	}
 
-	return ret
+	if an == 1 {
+		return 2
+	}
+
+	if ans, ok := twoMem[an]; ok {
+		return ans
+	}
+
+	half := twoPow(an / 2)
+	whole := (half * half) % mod
+
+	if an%2 == 0 {
+		twoMem[an] = whole
+		return twoPow(an)
+	}
+
+	twoMem[an] = (2 * whole) % mod
+	return twoPow(an)
+
 }
 
-func deNumberizeMatrix(list []uint64, lgth int) [][]bool {
-	ret := make([][]bool, len(list))
-
-	for i := 0; i < len(list); i++ {
-		ret[i] = deNumberize(list[i], lgth)
+func choose(n, k int) int64 {
+	if k == 0 || n == k {
+		return 1
 	}
-	return ret
 
+	if ans, ok := chooseMem[[2]int{n, k}]; ok {
+		return ans
+	}
+
+	ans := choose(n-1, k) + choose(n-1, k-1)
+	ans %= mod
+	chooseMem[[2]int{n, k}] = ans
+
+	return choose(n, k)
 }
 
-func rigid(state [][]bool) bool {
-	if count(evolve(state)) == len(state)*len(state[0]) {
-		return true
-	}
-	return false
-}
+func inter(i, j, n, m int) int64 {
+	ans := R(i, j)
+	ans *= choose(n-1, i-1)
+	ans %= mod
+	ans *= choose(m, j)
+	ans %= mod
+	ans *= twoPow((n - i) * (m - j))
+	ans %= mod
 
-func grid(n uint64, x, y int) [][]bool {
-	state := make([][]bool, x)
-	for i := 0; i < x; i++ {
-		state[i] = make([]bool, y)
-		for j := 0; j < y; j++ {
-			if n&1 == 1 {
-				state[i][j] = true
-			}
-
-			n >>= 1
-		}
-	}
-	return state
+	return ans
 }
 
 func main() {
 	starttime := time.Now()
 
-	a, b := 6, 3
-	size := uint64(1 << uint(a*b))
+	memo, chooseMem = make(map[[2]int]int64), make(map[[2]int]int64)
+	twoMem = make(map[int]int64)
 
-	count := 0
+	S := int64(0)
 
-	for i := uint64(0); i < size; i++ {
-		test := grid(i, a, b)
-		if rigid(test) {
-			count++
-			if count%1000 == 0 {
-				fmt.Println(count)
-			}
+	for i := 1; i <= N; i++ {
+		for j := 1; j <= N; j++ {
+			S += R(i, j)
+			S %= mod
 		}
-
 	}
 
-	fmt.Println(a, b, count)
+	fmt.Println(S)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
