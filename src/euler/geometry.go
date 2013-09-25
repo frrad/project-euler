@@ -122,6 +122,10 @@ func (c *Circle) Area() float64 {
 	return math.Pi * c.Radius * c.Radius
 }
 
+func (l *Line) Evaluate(x float64) float64 {
+	return l.Slope*x + l.Intercept
+}
+
 func MakeTriange(a, b, c *Point) *Triangle {
 	A := Point{a.X, a.Y}
 	B := Point{b.X, b.Y}
