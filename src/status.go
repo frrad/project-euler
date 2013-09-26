@@ -7,7 +7,26 @@ import (
 	"strings"
 )
 
-const path = "../eulerdata/status.html"
+const (
+	path   = "../eulerdata/status.html"
+	prizes = 4
+)
+
+var totals [prizes]int
+
+var names = [prizes]string{
+	"Prime Obsession",
+	"Triangle Trophy",
+	"Lucky Luke",
+	"Decimation II",
+}
+
+var taglines = [prizes]string{
+	"prime numbered problems",
+	"first triangle numbered problems",
+	"lucky numbered problems",
+	"rows",
+}
 
 func getNum(a string) int {
 	probLen := 8 //Length of `Problem '
@@ -98,43 +117,44 @@ func main() {
 	*/
 
 	done := 0
-	prime := 0
-	triangle := 0
-	lucky := 0
-	dec2 := 0
 
-	for i := 1; i <= 25; i++ {
-		if dict[i*(i+1)/2] {
-			triangle++
-		}
-	}
-
+	//PRIME NUMBERS (Index = 0)
 	for i := 1; i <= max; i++ {
 		if dict[i] {
 			done++
 			if euler.IsPrime(int64(i)) {
-				prime++
+				totals[0]++
 			}
 		}
 	}
 
-	luckyseive := luckySeive(max)
-	for i := 0; i < len(luckyseive); i++ {
-		if dict[luckyseive[i]] {
-			lucky++
+	//TRIANGLE NUMBERS (Index = 1)
+	for i := 1; i <= 25; i++ {
+		if dict[i*(i+1)/2] {
+			totals[1]++
 		}
 	}
 
+	//LUCKY NUMBER (Index = 2)
+	luckyseive := luckySeive(max)
+	for i := 0; i < len(luckyseive); i++ {
+		if dict[luckyseive[i]] {
+			totals[2]++
+		}
+	}
+
+	//DECIMATION II (Index = 3)
+	decStart := 200
 	for i := 0; i < 10; i++ {
 		here := 0
-		for j := 200 + 10*i + 1; j < 200+10*(i+1)+1; j++ {
+		for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
 			if dict[j] {
 				here++
 			}
 		}
 
 		if here > 0 {
-			dec2++
+			totals[3]++
 		}
 	}
 
@@ -164,16 +184,15 @@ func main() {
 	}
 	fmt.Print("\n\n")
 
-	fmt.Println("Prime Obsession:\t", prime, "/ 50 prime numbered problems")
-	fmt.Println("Triangle Trophy:\t", triangle, "/ 25 first triangle numbered problems")
-	fmt.Println("Lucky Luke:\t\t", lucky, "/ 50 lucky numbered problems")
-	fmt.Println("Decimation II:\t\t", dec2, "/ 10 rows")
+	for i := 0; i < prizes; i++ {
+		fmt.Printf("%s \t %d/ %s\n", names[i], totals[i], taglines[i])
+	}
 
 	fmt.Print("\n")
 
 	track := make(map[int]int)
 
-	if prime < 50 {
+	if totals[0] < 50 {
 		fmt.Print("Primes: ")
 		for i := 1; i < max; i++ {
 			if !dict[i] && euler.IsPrime(int64(i)) {
@@ -184,7 +203,7 @@ func main() {
 		fmt.Print("\n")
 	}
 
-	if triangle < 25 {
+	if totals[1] < 25 {
 		fmt.Print("Triangle Numbers: ")
 
 		for i := 1; i <= 25; i++ {
@@ -198,7 +217,7 @@ func main() {
 
 	}
 
-	if lucky < 50 {
+	if totals[2] < 50 {
 		fmt.Print("Lucky Numbers: ")
 
 		for i := 0; i < len(luckyseive); i++ {
@@ -211,7 +230,7 @@ func main() {
 		fmt.Print("\n")
 	}
 
-	if dec2 < 10 {
+	if totals[3] < 10 {
 		fmt.Print("Decimation II: ")
 
 		for i := 0; i < 10; i++ {
