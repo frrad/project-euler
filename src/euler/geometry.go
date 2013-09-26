@@ -51,6 +51,15 @@ func LineFromPoints(a, b *Point) (*Line, error) {
 
 }
 
+func (pt *Point) RightOf(line *Line) bool {
+
+	if line.Evaluate(pt.X) < pt.Y {
+		return true
+	}
+
+	return false
+}
+
 func LineFromPtSlope(slope float64, x *Point) *Line {
 	b := x.Y - slope*x.X
 	return &Line{slope, b, false}
@@ -63,6 +72,11 @@ func (l *Line) IntersectLine(m *Line) (intersection *Point, err error) {
 		} else {
 			return new(Point), errors.New("Can't find intersection: lines don't intersect")
 		}
+	}
+
+	if m.vertical == true || l.vertical == true {
+		return new(Point), errors.New("Vertical Lines!!")
+
 	}
 
 	x := (m.Intercept - l.Intercept) / (l.Slope - m.Slope)
@@ -105,7 +119,7 @@ func Bisect(x, y *Point) (*Line, error) {
 	}
 
 	if through.Slope == 0 {
-		return new(Line), errors.New("Support for slope through xy = 0 unimplemented.")
+		return &Line{0, x.Midpoint(y).X, true}, nil
 	}
 
 	slope := -1 / through.Slope
