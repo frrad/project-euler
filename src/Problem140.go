@@ -1,43 +1,41 @@
 package main
 
 import (
-	//	"euler"
 	"fmt"
 	"time"
 )
 
-var memo map[int]int64
+const height = 30
 
-func fib(index int) int64 {
-	if index == 1 {
-		return 1
-	}
-
-	if index == 2 {
-		return 4
-	}
-
-	if answer, ok := memo[index]; ok {
-		return answer
-	}
-
-	answer := fib(index-1) + fib(index-2)
-
-	memo[index] = answer
-	return answer
-}
-
+//Note: Brute force is too slow, solved Diophantine equation
+//5 x^2 + 14 x + 1 == y^2 with Mathematica
+//By math x is FGN iff 5 x^2 + 14 x + 1 is a perfect square
 func main() {
 	starttime := time.Now()
-	memo = make(map[int]int64)
 
-	for i := 1; i < 50; i++ {
+	square := int64(1)
+	i := int64(1)
+	count := 0
+	total := int64(0)
 
-		fmt.Print(fib(i), ",")
+	for x := int64(1); count < height; x++ {
+		test := 1 + 14*x + 5*x*x
 
-		//fmt.Println(fib(i) * fib(i+1))
+		for square < test {
+			square += (2 * i) + 1
+			i++
+		}
+
+		if test == square {
+			fmt.Println(count+1, "\t", x)
+			count++
+			total += x
+		}
 
 	}
+
+	fmt.Println("==========")
+	fmt.Println(total)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
