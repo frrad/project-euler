@@ -1,65 +1,49 @@
 package main
 
 import (
+	"euler"
 	"fmt"
+	"time"
 )
 
-func istripple(a int, b int) bool {
-	max := b
-	if a > b {
-		max = a
-	}
-
-	target := int64(a)*int64(a) + int64(b)*int64(b)
-
-	c := int64(max)
-
-	for c*c < target {
-
-		c++
-	}
-	return c*c == target
-}
-
-func third(a int, b int) int64 {
-	max := b
-	if a > b {
-		max = a
-	}
-
-	target := int64(a)*int64(a) + int64(b)*int64(b)
-
-	c := int64(max)
-
-	for c*c < target {
-
-		c++
-	}
-	return c
-}
+const target = 12
 
 func main() {
+	starttime := time.Now()
 
-	total := int64(0)
 	count := 0
+	answer := int64(0)
 
-	b := 2
+	for n := int64(1); count < target; n++ {
 
-	for count < 12 {
-		for offset := -1; offset < 3; offset += 2 {
+		MCans := make([]int64, 0)
 
-			h := b + offset
-			if istripple(b, 2*h) && third(b, 2*h)%2 == 0 {
-				l := third(b, 2*h) / 2
-				fmt.Println(b, h, l)
-				total += l
-				count++
-			}
-
+		if sqrt, ok := euler.IntSqrt(5*n*n + 1); ok {
+			MCans = append(MCans, 2*n+sqrt)
 		}
-		b++
+		if sqrt, ok := euler.IntSqrt(5*n*n - 1); ok {
+			MCans = append(MCans, 2*n+sqrt)
+		}
+		if sqrt, ok := euler.IntSqrt(5*n*n + 2); ok {
+			MCans = append(MCans, n+sqrt)
+		}
+		if sqrt, ok := euler.IntSqrt(5*n*n - 2); ok {
+			MCans = append(MCans, n+sqrt)
+		}
+
+		for _, m := range MCans {
+			a, b, c := m*m-n*n, 2*m*n, m*m+n*n
+
+			count++
+			answer += c
+
+			fmt.Println(a, b, c)
+		}
 
 	}
 
-	fmt.Println(total)
+	fmt.Println("==========")
+	fmt.Println(answer)
+
+	fmt.Println("Elapsed time:", time.Since(starttime))
 }
