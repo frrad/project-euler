@@ -8,7 +8,7 @@ import (
 )
 
 const (
-	epsilon  = .0001
+	epsilon  = .000001
 	num, den = 1, 12345
 )
 
