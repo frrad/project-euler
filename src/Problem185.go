@@ -159,32 +159,6 @@ func fixed(options []map[string]bool) bool {
 	return true
 }
 
-func guess(options []map[string]bool) {
-	bGuessScore, bGuessIndex := 10000, 0
-
-	for i := 0; i < len(options); i++ {
-		if len(options[i]) > 1 && len(options[i]) < bGuessScore {
-			bGuessIndex = i
-			bGuessScore = len(options[i])
-		}
-
-	}
-
-	pick := rand.Int() % bGuessScore
-	guess := ""
-
-	i := 0
-	for key, _ := range options[bGuessIndex] {
-		if i == pick {
-			guess = key
-		}
-		i++
-	}
-
-	options[bGuessIndex] = make(map[string]bool)
-	options[bGuessIndex][guess] = true
-}
-
 func stupid(options []map[string]bool) bool {
 
 	for i := 0; i < guessN; i++ {
@@ -209,34 +183,72 @@ func stupid(options []map[string]bool) bool {
 	return false
 }
 
+func solve(assume [height]int) (works bool, answer [height]int) {
+	// fmt.Println("Solving:", assume)
+	state := reSeed()
+
+	for i := 0; i < height; i++ {
+		if val := assume[i]; val != -1 {
+			state[i] = make(map[string]bool)
+			valS := strconv.Itoa(val)
+			state[i][valS] = true
+		}
+	}
+
+	infer(state)
+
+	for i := 0; i < height; i++ {
+		counter := 0
+		an := -1
+		for j := 0; j < 10; j++ {
+			if state[i][strconv.Itoa(j)] {
+				counter++
+				an = j
+			}
+		}
+		if counter == 1 {
+			assume[i] = an
+		}
+	}
+
+	if fixed(state) && !stupid(state) {
+		return true, assume
+	}
+
+	if (fixed(state) && stupid(state)) || !alive(state) {
+		return false, assume
+	}
+
+	bGuessScore, bGuessIndex := 10000, 0
+
+	for i := 0; i < len(state); i++ {
+		if len(state[i]) > 1 && len(state[i]) < bGuessScore {
+			bGuessIndex = i
+			bGuessScore = len(state[i])
+		}
+
+	}
+
+	for key, _ := range state[bGuessIndex] {
+		kee, _ := strconv.Atoi(key)
+		assume[bGuessIndex] = kee
+
+		tr, ans := solve(assume)
+
+		if tr {
+			return true, ans
+		}
+
+	}
+
+	return false, assume //OH no!
+
+}
+
 func main() {
 	starttime := time.Now()
 
-	for i := 0; i < guessN; i++ {
-		fmt.Println(gS[i], gI[i])
-	}
-
-	options := reSeed()
-
-	for !fixed(options) {
-
-		guess(options)
-
-		infer(options)
-
-		if (fixed(options) && stupid(options)) || !alive(options) {
-			options = reSeed()
-			infer(options)
-		}
-
-	}
-
-	for i := 0; i < height; i++ {
-		for dig, _ := range options[i] {
-			fmt.Print(dig)
-		}
-	}
-	fmt.Print("\n")
+	fmt.Println(solve([height]int{-1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1}))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
