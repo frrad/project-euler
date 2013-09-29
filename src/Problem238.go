@@ -2,132 +2,230 @@ package main
 
 import (
 	"fmt"
-	"math/rand"
+	"math"
+
 	"time"
 )
 
-const dim = 4
+const (
+	dim      = 7
+	accuracy = 20
+)
 
-func coefficients(epsilon [dim]float64) [dim]float64 {
-	return [dim]float64{24 + 24*epsilon[0] + 12*epsilon[1] + 12*epsilon[0]*epsilon[1] + 8*epsilon[2] + 8*epsilon[0]*epsilon[2] + 4*epsilon[1]*epsilon[2] + 4*epsilon[0]*epsilon[1]*epsilon[2] + 6*epsilon[3] + 6*epsilon[0]*epsilon[3] + 3*epsilon[1]*epsilon[3] + 3*epsilon[0]*epsilon[1]*epsilon[3] + 2*epsilon[2]*epsilon[3] + 2*epsilon[0]*epsilon[2]*epsilon[3] + epsilon[1]*epsilon[2]*epsilon[3] + epsilon[0]*epsilon[1]*epsilon[2]*epsilon[3], -50 - 26*epsilon[0] - 19*epsilon[1] - 7*epsilon[0]*epsilon[1] - 14*epsilon[2] - 6*epsilon[0]*epsilon[2] - 5*epsilon[1]*epsilon[2] - epsilon[0]*epsilon[1]*epsilon[2] - 11*epsilon[3] - 5*epsilon[0]*epsilon[3] - 4*epsilon[1]*epsilon[3] - epsilon[0]*epsilon[1]*epsilon[3] - 3*epsilon[2]*epsilon[3] - epsilon[0]*epsilon[2]*epsilon[3] - epsilon[1]*epsilon[2]*epsilon[3], 35 + 9*epsilon[0] + 8*epsilon[1] + epsilon[0]*epsilon[1] + 7*epsilon[2] + epsilon[0]*epsilon[2] + epsilon[1]*epsilon[2] + 6*epsilon[3] + epsilon[0]*epsilon[3] + epsilon[1]*epsilon[3] + epsilon[2]*epsilon[3], -10 - epsilon[0] - epsilon[1] - epsilon[2] - epsilon[3]}
+func poly(co [dim]float64, x float64) float64 {
+	ans := co[0]
+	for i := 1; i < dim; i++ {
+		term := co[i]
+		for j := 0; j < i; j++ {
+			term *= x
+		}
+		ans += term
+	}
+
+	monic := x
+	for i := 0; i < dim-1; i++ {
+		monic *= x
+	}
+
+	ans += monic
+
+	return ans
 }
 
-func dist(a, b [dim]float64) (dist float64) {
+func polyD(co [dim]float64, x float64) (ans float64) {
+	for i := 1; i < dim; i++ {
+		term := co[i] * float64(i)
+		for j := 0; j < i-1; j++ {
+			term *= x
+		}
+		ans += term
+	}
 
-	for i := 0; i < dim; i++ {
-		dist += (a[i] - b[i]) * (a[i] - b[i])
+	monic := float64(dim)
+
+	for i := 0; i < dim-1; i++ {
+		monic *= x
+	}
+	ans += monic
+
+	return ans
+}
+
+func NR(quality int, start float64, f, Df func(float64) float64) (x float64) {
+	x = start
+	for i := 0; i < quality; i++ {
+		x = x - (f(x) / Df(x))
 	}
 	return
 }
 
-func add(a, b [dim]float64) (ans [dim]float64) {
-	for i := 0; i < dim; i++ {
-		ans[i] = a[i] + b[i]
+func quo(f, g func(float64) float64) func(float64) float64 {
+	var ans = func(x float64) float64 {
+
+		if g(x) == 0 {
+			fmt.Print("asdfasdfasd")
+		}
+
+		return f(x) / g(x)
+
 	}
-	return
+	return ans
 }
 
-func randVec(delta float64) (vec [dim]float64) {
-	for i := 0; i < dim; i++ {
-		vec[i] = (rand.Float64() * delta) - .5*delta
+func quoD(f, fD, g, gD func(float64) float64) func(float64) float64 {
+	var ans = func(x float64) float64 {
+		if g(x) == 0 {
+			fmt.Print("asdfasdfasd")
+		}
+
+		return ((g(x) * fD(x)) - (f(x) * gD(x))) / (g(x) * g(x))
 	}
-	return
+	return ans
 }
 
-func crazy(vec [dim]float64, thresh float64) bool {
+func rt(a float64) func(float64) float64 {
+	var ans = func(x float64) float64 {
+		return x - a
+	}
+	return ans
+}
 
+func roots(co [dim]float64) [dim]float64 {
+	thresher := .001
+
+	var f = func(x float64) float64 {
+		return poly(co, x)
+	}
+
+	var Df = func(x float64) float64 {
+		return polyD(co, x)
+	}
+
+	var one = func(x float64) float64 {
+		return 1
+	}
+
+	plc := 0
+	ans := [dim]float64{}
+
+	root := NR(accuracy, .01, f, Df)
+	if math.Abs(f(root)) > thresher {
+		return ans
+	}
+	ans[plc] = root
+	plc++
+
+	for i := 0; i < dim-1; i++ {
+
+		f, Df = quo(f, rt(root)), quoD(f, Df, rt(root), one)
+
+		root = NR(accuracy, .001, f, Df)
+		if math.Abs(f(root)) > thresher {
+			return ans
+		}
+		ans[plc] = root
+		plc++
+
+		// fmt.Println(root)
+	}
+
+	return ans
+}
+
+func shew(a, b float64, f func(float64) float64) {
+	fmt.Print("{")
+	for i := a; i < b; i += .1 {
+		fmt.Print(f(i), ",")
+	}
+	fmt.Print("}\n\n")
+}
+
+func check(co [dim]float64) bool {
+	rts := roots(co)
+
+	thresh := .001
 	for i := 0; i < dim; i++ {
-		if vec[i] < -1*thresh || vec[i] > 1+thresh {
-			return true
+		if rd := round(rts[i]); math.Abs(rd-rts[i]) < thresh {
+			if poly(co, rd) == 0 {
+				rts[i] = rd
+			}
 		}
 	}
 
-	return false
+	// fmt.Println(rts)
 
-}
-
-func sanitize(vec [dim]float64) [dim]float64 {
+	var used [dim]bool
 
 	for i := 0; i < dim; i++ {
-		if vec[i] < 0 {
-			vec[i] = 0
+		place := int(math.Floor(rts[i]))
+		if place < 1 || place > dim {
+			return false
 		}
-		if vec[i] > 1 {
-			vec[i] = 1 - .00001
+		if !used[place-1] {
+			used[place-1] = true
+		} else {
+			return false
 		}
 	}
 
-	return vec
+	return true
+}
+
+func round(x float64) float64 {
+	rd := float64(int(x))
+	if x-rd > .5 {
+		rd++
+	}
+	return rd
+}
+
+func show(a [dim]float64) {
+	fmt.Print("{")
+	for i := 0; i < dim; i++ {
+		fmt.Print(int(a[i]), ",")
+	}
+	fmt.Print("},")
 
 }
 
 func main() {
 	starttime := time.Now()
 
-	delta := .001      //Constrols jump speed
-	threshold := .0001 //convergence accuracy
-	tired := 100000
+	sum := 0
 
-	targets := make(map[[dim]float64]bool)
+	for a := -40320.; a <= -5040; a++ {
+		fmt.Println("a", a)
+		for b := 13068.; b <= 69264; b++ {
+			fmt.Println("b", b)
+			for c := -48860.; c <= -13132; c++ {
+				for d := 6769.; d <= 18424; d++ {
+					for e := -4025.; e <= -1960; e++ {
+						for f := 322.; f <= 511; f++ {
 
-	grid := .1
-	for a := 0.; a < 1; a += grid {
-		for b := 0.; b < 1; b += grid {
-			for c := 0.; c < 1; c += grid {
-				for d := 0.; d < 1; d += grid {
+							for g := -35.; g < -28; g++ {
 
-					co := coefficients([dim]float64{a, b, c, d})
+								testco := [dim]float64{a, b, c, d, e, f, g}
+								if check(testco) {
 
-					for i := 0; i < dim; i++ {
-						co[i] = float64(int(co[i]))
+									show(testco)
+									for i := 0; i < dim; i++ {
+										sum += int(math.Abs(testco[i]))
+									}
+
+									fmt.Println(sum)
+								}
+							}
+						}
 					}
-
-					targets[co] = true
-
 				}
 			}
 		}
 	}
 
-	potato := 0
+	fmt.Println(sum)
 
-	for target, _ := range targets {
-		fmt.Print("\r", potato, len(targets))
-		potato++
-
-		current := [dim]float64{.5, .5, .5, .5}
-
-		count := 0
-
-		for dist(target, coefficients(current)) > threshold && count < tired {
-			count++
-			push := randVec(delta)
-			nu := add(current, push)
-			nu = sanitize(nu)
-
-			myScore := dist(target, coefficients(current))
-			newScore := dist(target, coefficients(nu))
-
-			if newScore < myScore {
-				current = nu
-
-				// fmt.Println(current)
-				// fmt.Println(coefficients(current))
-				// fmt.Println("=============")
-			}
-
-		}
-
-		if tired == count {
-			// fmt.Println("tired")
-		} else {
-			fmt.Println("===========")
-			fmt.Println(current)
-			fmt.Println(coefficients(current))
-			fmt.Println("TARGET=", target)
-		}
-
-	}
+	// testco := [dim]float64{26, -52, 48, -12}
+	// fmt.Println(check(testco))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
