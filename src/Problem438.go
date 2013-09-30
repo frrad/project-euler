@@ -6,7 +6,7 @@ import (
 )
 
 const dim = 7
-const bishes = 4
+const sweep = 4
 
 func works(a [dim]int64) bool {
 
@@ -45,19 +45,19 @@ func main() {
 	for len(tocheck) > 0 {
 		for key, _ := range tocheck {
 
-			for a := int64(-1 * bishes); a <= 1*bishes; a++ {
+			for a := int64(-1 * sweep); a <= 1*sweep; a++ {
 
-				for b := int64(-1 * bishes); b <= 1*bishes; b++ {
+				for b := int64(-1 * sweep); b <= 1*sweep; b++ {
 
-					for c := int64(-1 * bishes); c <= 1*bishes; c++ {
+					for c := int64(-1 * sweep); c <= 1*sweep; c++ {
 
-						for d := int64(-1 * bishes); d <= 1*bishes; d++ {
+						for d := int64(-1 * sweep); d <= 1*sweep; d++ {
 
-							for e := int64(-1 * bishes); e <= 1*bishes; e++ {
+							for e := int64(-1 * sweep); e <= 1*sweep; e++ {
 
-								for f := int64(-1 * bishes); f <= 1*bishes; f++ {
+								for f := int64(-1 * sweep); f <= 1*sweep; f++ {
 
-									for g := int64(-1 * bishes); g <= 1*bishes; g++ {
+									for g := int64(-1 * sweep); g <= 1*sweep; g++ {
 
 										tickle := sum(key, [dim]int64{a, b, c, d, e, f, g})
 
