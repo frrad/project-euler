@@ -27,3 +27,5 @@ eulerdata/status.html
 eulerdata/settings.dat
 eulerdata/known.txt
 eulerdata/captcha/*.png
+
+haskell/*.hi
