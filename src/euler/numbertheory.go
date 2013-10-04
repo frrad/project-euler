@@ -44,6 +44,17 @@ func Factor(n int64) []int64 {
 	return answer
 }
 
+//If q is a quadratic residuce mod p return its sqrt
+//Note: brute force implementation is stupid
+func SqrtMod(q int64, p int64) (sqrt1, sqrt2 int64, works bool) {
+	for en := int64(0); en < p/2; en++ {
+		if (en*en)%p == q {
+			return en, p - en, true
+		}
+	}
+	return 0, 0, false
+}
+
 //ax + by = gcd(a,b)
 func ExtendedEuclidean(a, b int64) (x, y int64) {
 	x, lastx := int64(0), int64(1)
