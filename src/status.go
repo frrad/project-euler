@@ -17,8 +17,8 @@ var totals [prizes]int
 var names = [prizes]string{
 	"Prime Obsession",
 	"Triangle Trophy",
-	"Lucky Luke",
-	"Decimation II",
+	"Lucky Luke\t",
+	"Decimation II\t",
 }
 
 var taglines = [prizes]string{
@@ -26,6 +26,13 @@ var taglines = [prizes]string{
 	"first triangle numbered problems",
 	"lucky numbered problems",
 	"rows",
+}
+
+var goals = [prizes]int{
+	50,
+	25,
+	50,
+	10,
 }
 
 func getNum(a string) int {
@@ -185,7 +192,7 @@ func main() {
 	fmt.Print("\n\n")
 
 	for i := 0; i < prizes; i++ {
-		fmt.Printf("%s \t %d/ %s\n", names[i], totals[i], taglines[i])
+		fmt.Printf("%s \t %d/%d %s\n", names[i], totals[i], goals[i], taglines[i])
 	}
 
 	fmt.Print("\n")
