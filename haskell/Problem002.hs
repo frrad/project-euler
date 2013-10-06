@@ -1,6 +1,9 @@
 fib 0 = 1
 fib 1 = 1
-fib n = fib(n-1) + fib(n-2)
+fib n = fibL !! (n-1) + fibL !! (n-2)
 
+fibL = map fib [0..]
 
-main = putStrLn (show(fib 111))
+answer = sum . filter even $ takeWhile (<=4000000) fibL
+
+main = putStrLn (show(answer))
