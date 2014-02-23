@@ -1,6 +1,7 @@
 package main
 
 import (
+	"euler"
 	"fmt"
 	"time"
 )
@@ -55,7 +56,7 @@ func interesting(l, w int) uint64 {
 
 	tri1, tri2 = sort(tri1, tri2)
 
-	fmt.Println("tri1", tri1, "tri2", tri2, "square", square)
+	// fmt.Println("tri1", tri1, "tri2", tri2, "square", square)
 
 	grid := make([][]bool, square)
 	for i := range grid {
@@ -96,7 +97,7 @@ func interesting(l, w int) uint64 {
 		}
 	}
 
-	show(grid)
+	// show(grid)
 
 	tally := uint64(0)
 
@@ -145,13 +146,38 @@ func show(grid [][]bool) {
 
 }
 
-func blend(a, b int) uint64 {
-	return interesting(a, b) + boring(a, b)
+func predict(a, b int) int64 {
+	b, a = sort(a, b)
+
+	if a == 1 {
+		return int64(b - 1)
+	}
+
+	if a > b {
+		panic("adf")
+	}
+
+	offset := 0
+
+	factors := euler.Factors(int64(a))
+
+	if factors[0][0] > 3 {
+		offset = -1
+	}
+
+	return int64(offset - (a / 2) + (a*a)/6 - (2*a*a*a*a)/3 - (a*b)/3 + (4*a*a*a*b)/3)
+
 }
 
-//think of sideways grid as normal one sans corners
-func weird(a, b uint64) uint64 {
-	return 0
+func blend(a, b int) uint64 {
+	bore := uint64(0)
+	if predict(a, b) < 0 {
+		fmt.Println("anus")
+		bore = interesting(a, b)
+	} else {
+		bore = uint64(predict(a, b))
+	}
+	return boring(a, b) + bore
 }
 
 func main() {
@@ -160,17 +186,24 @@ func main() {
 	borMemo = make(map[[2]int]uint64)
 
 	sum := uint64(0)
+	tip, top := 47, 43
 
-	lid, lad := 3, 2
-
-	for i := 1; i <= lid; i++ {
-		for j := 1; j <= lad; j++ {
-			fmt.Println(i, j)
+	for i := 1; i <= tip; i++ {
+		for j := 1; j <= top; j++ {
 			sum += blend(i, j)
 		}
 	}
 
 	fmt.Println(sum)
+
+	// for i := 1; i < 50; i++ {
+	// 	a, b := uint64(predict(i, i)), interesting(i, i)
+	// 	if a != b {
+	// 		fmt.Println(i, ":", a, b)
+	// 	} else {
+	// 		fmt.Println(i)
+	// 	}
+	// }
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
