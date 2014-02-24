@@ -15,6 +15,10 @@ var totientTable [totientTableLength]int64
 var factorialtable = make(map[int64]int64)
 
 func Divisors(n int64) int64 {
+	if n == 1 {
+		return 1
+	}
+
 	factors := Factors(n)
 	div := int64(1)
 	for i := 0; i < len(factors); i++ {
