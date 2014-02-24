@@ -68,6 +68,45 @@ func ExtendedEuclidean(a, b int64) (x, y int64) {
 	return lastx, lasty
 }
 
+//Euclid's Algorithm
+//(Recursive implementation eats memory)
+func GCD(n int64, m int64) int64 {
+	if n == 0 {
+		return m
+	}
+	if m == 0 {
+		return m
+	}
+	if m < 0 {
+		m = -m
+	}
+	if n < 0 {
+		n = -n
+	}
+
+	max := Max(m, n)
+	min := Min(m, n)
+
+	for min != max {
+		min = Min(min, max-min)
+		max = Max(min, max-min)
+	}
+
+	return min
+
+}
+
+func LCM(a, b int64) int64 {
+	if a == 0 || b == 0 {
+		if a == b {
+			return 0
+		}
+		return Max(a, b)
+	}
+
+	return (a * b) / GCD(a, b)
+}
+
 //what's X^-1 mod n? (assuming of course x, n coprime)
 func InverseMod(x, n int64) int64 {
 	ans, _ := ExtendedEuclidean(x, n)

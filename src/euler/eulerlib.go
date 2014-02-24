@@ -240,34 +240,6 @@ func Max(m int64, n int64) int64 {
 	return m
 }
 
-//Euclid's Algorithm
-//(Recursive implementation eats memory)
-func GCD(n int64, m int64) int64 {
-	if n == 0 {
-		return m
-	}
-	if m == 0 {
-		return m
-	}
-	if m < 0 {
-		m = -m
-	}
-	if n < 0 {
-		n = -n
-	}
-
-	max := Max(m, n)
-	min := Min(m, n)
-
-	for min != max {
-		min = Min(min, max-min)
-		max = Max(min, max-min)
-	}
-
-	return min
-
-}
-
 //Adds fractions quickly, may unreduce
 func FastFracAdd(num1 int64, den1 int64, num2 int64, den2 int64) (num int64, den int64) {
 	return num1*den2 + num2*den1, den1 * den2
