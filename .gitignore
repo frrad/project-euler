@@ -29,3 +29,6 @@ eulerdata/known.txt
 eulerdata/captcha/*.png
 
 haskell/*.hi
+
+# compiled python
+python/*.pyc
