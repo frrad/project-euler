@@ -60,3 +60,9 @@ def palindrome(n):
 
     return True
 
+factorialCache = dict({1:1, 2:2})
+def factorial(n):
+    if n in factorialCache:
+        return factorialCache[n]
+    factorialCache[n]=factorial(n-1)*n
+    return factorial(n)
