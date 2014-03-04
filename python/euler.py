@@ -1,5 +1,7 @@
+####################################
+###Primality, Factorization, etc.###
+####################################
 primes = [2]
-
 def prime(n):
     if len(primes) >= n:
         return primes[n-1]
@@ -23,6 +25,19 @@ def factor(n):
         test += 1
     return [n]
 
+def factors(n):
+    basic = factor(n)
+    basic.reverse() #want ascending order
+    left, right = 0,0
+    answer = []
+    while left < len(basic):
+        while right < len(basic) and basic[left] == basic[right]:
+            right += 1
+        answer.append((basic[left], right-left))
+        left = right
+    return answer
+
+
 def primeQ(n):
     if len(factor(n)) == 1:
         return True
@@ -39,11 +54,19 @@ def GCD(a,b):
 def LCM(a,b):
     return a*b / GCD(a,b)
 
+#number of divisors (\sigma_0)
+def divisors(n):
+    fac = factors(n)
+    d = 1
+    for (_, a) in fac:
+        d *= a+1
+    return d
+
+
 #######################
 ###Special Sequences###
 #######################
 fibCache = dict({0:1, 1:1})
-
 def fib(n):
     if n in fibCache:
         return fibCache[n]
@@ -66,3 +89,6 @@ def factorial(n):
         return factorialCache[n]
     factorialCache[n]=factorial(n-1)*n
     return factorial(n)
+
+def triangle(n):
+    return n*(n+1)/2
