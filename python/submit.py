@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 #Submitter tool. For now only offline. Checks against database of correct answers.
 
 
@@ -19,6 +21,20 @@ def validate(lookup, q, a):
         print "Incorrect."
         return False
 
+def solve(problem):
+    print "Solving Problem #%d" % problem
+    cmd = command(problem)
+
+    p = subprocess.Popen(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+    out, err = p.communicate()
+    if err != "":
+        print "There was an error executing %s" % cmd
+        sys.exit(1)
+
+    answer = out.split("\n")[-2]
+    print "Problem Solved: %s" % answer
+    return answer
+
 
 f = open(answerPath, "r")
 data =  f.read().split("\n")
@@ -33,9 +49,6 @@ for line in data:
     else:
         pass#maybe we shouldn't fail silently?
 
-
-
-
 if len(sys.argv) == 3:
     #two arguments: problem and solution
     problem, solution = int(sys.argv[1]), sys.argv[2]
@@ -43,22 +56,18 @@ if len(sys.argv) == 3:
 
 
 elif len(sys.argv) == 2:
-    #one argument: problem number. run and check answer
-    problem = int(sys.argv[1]) 
+    #one argument: problem number (or range). run and check answer
+    if "-" in sys.argv[1]: #we're dealing with a range
+        endpts = sys.argv[1].split("-")
+        start, end = int(endpts[0]), int(endpts[1])
+        for problem in xrange(start,end+1):
+            answer = solve(problem)
+            validate(lookup,problem,answer)
 
-    print "Solving Problem #%d" % problem
-    cmd = command(problem)
-
-    p = subprocess.Popen(cmd, stdout=subprocess.PIPE,stderr=subprocess.PIPE)
-    out, err = p.communicate()
-    if err != "":
-        print "There was an error executing %s" % cmd
-        sys.exit(1)
-
-    answer = out.split("\n")[-2]
-    print "Problem Solved: %s" % answer
-
-    validate(lookup,problem,answer)
+    else: #just one problem is specified
+        problem = int(sys.argv[1]) 
+        answer = solve(problem)
+        validate(lookup,problem,answer)
 
 else: 
     print "Wrong number of arguments"
