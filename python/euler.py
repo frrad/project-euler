@@ -58,9 +58,13 @@ def factors(n):
 
 
 def primeQ(n):
-    if len(factor(n)) == 1:
-        return True
-    return False
+    d = 2
+    while d * d  <= n:
+        if n % d == 0:
+            return False
+        d += 1
+    return True
+
 
 #Euclid's algorithm
 def GCD(a,b):

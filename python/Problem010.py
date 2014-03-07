@@ -1,11 +1,10 @@
 import euler
 
-primes = []
-n=1
+total = 0
 
-#super slow (~1min). use a sieve 
-while euler.prime(n) < 2000000:
-    primes.append(euler.prime(n))
-    n+=1
+for x in xrange(2, 2000000):
+    if euler.primeQ(x):
+        total += x
 
-print sum(primes)
+
+print total
