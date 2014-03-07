@@ -15,11 +15,20 @@ def validate(lookup, q, a):
         print "Problem %s not in table" % q
         sys.exit(1) #exit with error
     if lookup[q]==a:
-        print "Correct!"
         return True
     else:
-        print "Incorrect."
         return False
+
+def progress(start,end,solved):
+    tosolve = end-start + 1
+    percent = float(solved)/tosolve
+
+    draw = int(tosolve * percent)
+    undraw = tosolve - draw
+
+    fancy = "["+ draw*'-' + undraw*" "+"]"
+
+    return '{} {}/{}'.format(fancy ,solved,tosolve)
 
 def solve(problem):
     print "Solving Problem #%d" % problem
@@ -59,15 +68,30 @@ elif len(sys.argv) == 2:
     #one argument: problem number (or range). run and check answer
     if "-" in sys.argv[1]: #we're dealing with a range
         endpts = sys.argv[1].split("-")
-        start, end = int(endpts[0]), int(endpts[1])
+        if len(endpts[0]) == 0:
+            start = 1
+        else:
+            start =int(endpts[0])
+
+        end =  int(endpts[1])
+        solved = 0
         for problem in xrange(start,end+1):
             answer = solve(problem)
-            validate(lookup,problem,answer)
+            message = "Incorrect."
+            if validate(lookup,problem,answer):
+                message = "Correct!"
+                solved += 1
+                 
+            print '{} {}'.format(message,progress(start,end,solved))
 
     else: #just one problem is specified
         problem = int(sys.argv[1]) 
         answer = solve(problem)
-        validate(lookup,problem,answer)
+        if validate(lookup,problem,answer):
+            print "Correct!"
+        else:
+            print "Incorrect."
+
 
 else: 
     print "Wrong number of arguments"

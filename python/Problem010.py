@@ -1,10 +1,12 @@
 import euler
 
 total = 0
+x = 1
 
-for x in xrange(2, 2000000):
-    if euler.primeQ(x):
-        total += x
+euler.primeCache(2000000)
 
+while euler.prime(x) < 2000000:
+    total += euler.prime(x)
+    x+=1
 
 print total

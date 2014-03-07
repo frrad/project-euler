@@ -1,3 +1,4 @@
+import math
 ###################
 ###Combinatorics###
 ###################
@@ -30,6 +31,33 @@ def prime(n):
             start += 1
         primes.append(start)
     return prime(n)
+
+
+def primeCache(n):
+    list = [True for x in range(n)]
+    list[0] = False
+    i = 0
+
+    while i < int(math.ceil(math.sqrt(n))):
+        j = i + 1
+        while not list[j]:
+            j += 1
+        j += 1
+
+        count = j 
+        while j - 1 < len(list) - count:
+            list[count + j - 1] = False
+            j += count
+        i += 1
+        while not list[i]:
+            i += 1
+
+    global primes 
+    primes = []
+    for j in xrange(0, n):
+        if list[j]:
+            primes.append(j+1)
+
 
 #speed up using prime list?
 def factor(n):
