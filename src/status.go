@@ -48,7 +48,6 @@ func getNum(a string) int {
 }
 
 func luckySeive(max int) []int {
-
 	luckyseive := make([]int, max)
 	for i := 0; i < max; i++ {
 		luckyseive[i] = i + 1
@@ -90,7 +89,7 @@ func main() {
 	dict := make(map[int]bool)
 
 	for _, line := range page {
-		split := strings.Split(line, "<td style=\"width:20px;height:20px;vertical-align:middle;background-color:#")
+		split := strings.Split(line, "vertical-align:middle;background-color:#")
 		for _, prob := range split {
 
 			if len(prob) > 5 {
