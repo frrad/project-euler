@@ -1,7 +1,19 @@
 months = dict({1:31, 2:28, 3:31,4:30,5:31,6:30,7:31,8:31,9:30,10:31,11:30,12:31})
 
+def isLeap(year):
+    if year % 4 == 0:
+        if year %100 ==0:
+            if year % 400 ==0:
+                return True
+            return False
+        return True
+    return False
+
+
 def mutate(day, month, year, dow):
     dow += months[month]
+    if month ==2 and isLeap(year):
+        dow += 1
     dow %= 7
 
     month = (month + 1) % 12
