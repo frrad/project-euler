@@ -7,19 +7,53 @@ import (
 	"time"
 )
 
+var sigtab map[uint64]uint64
+
 func sigma(n uint64) uint64 {
-	var total uint64
-	for i := uint64(1); i <= n; i++ {
-		if n%i == 0 {
-			total += i * i
-		}
+	if ans, ok := sigtab[n]; ok {
+		return ans
 	}
-	return total
+
+	top := uint64(math.Sqrt(float64(n))) + 1
+	prime := uint64(2)
+
+	for i := int64(1); prime <= top; i++ {
+		prime = uint64(euler.Prime(i))
+		if n%prime == 0 {
+			j := 0
+
+			oldn := n
+
+			for n%prime == 0 {
+				n /= prime
+				j++
+			}
+
+			adjust := uint64(1)
+			factor := prime * prime
+
+			for k := 1; k <= j; k++ {
+				adjust += factor
+				factor *= prime * prime
+			}
+
+			ans := adjust * sigma(n)
+
+			sigtab[oldn] = ans
+			return sigma(oldn)
+		}
+
+	}
+
+	// n prime:
+	sigtab[n] = n*n + 1
+
+	return sigma(n)
 }
 
 func isSquare(n uint64) bool {
 	sqrt := uint64(math.Sqrt(float64(n)))
-	if sqrt*sqrt == n {
+	if sqrt*sqrt == n || (sqrt+1)*(sqrt+1) == n {
 		return true
 	}
 	return false
@@ -27,18 +61,22 @@ func isSquare(n uint64) bool {
 
 func main() {
 	starttime := time.Now()
+	sigtab = make(map[uint64]uint64)
+	sigtab[1] = 1
 
+	total := uint64(0)
 	count := 1
 
-	for i := uint64(2); i < 100000000; i++ {
-		if isSquare(sigma(i)) {
-			sqrt := int64(math.Sqrt(float64(sigma(i))))
-			fmt.Println(count, ":",
-				i, "=", euler.Factors(int64(i)), "\t",
-				sigma(i), "=", sqrt, euler.Factors(sqrt))
+	for i := uint64(1); i < 64000000; i++ {
+		sig := sigma(i)
+
+		if isSquare(sig) {
+			// fmt.Println(count, ":", i, "\t\t\t", sig, "\t\t\t", total)
 			count++
+			total += i
 		}
 	}
+	fmt.Println(total)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
