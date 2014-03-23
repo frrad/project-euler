@@ -3,9 +3,10 @@
 #Submitter tool. For now only offline. Checks against database of correct answers.
 
 
-import sys, subprocess
+import sys, subprocess, time
 
 answerPath = '''../eulerdata/known.txt'''
+infinity = 9999999999
 
 def command(problem):
     return ['python', 'Problem%03d.py'%problem]
@@ -13,11 +14,11 @@ def command(problem):
 def validate(lookup, q, a):
     if not q in lookup:
         print "Problem %s not in table" % q
-        sys.exit(1) #exit with error
+        return False, False
     if lookup[q]==a:
-        return True
+        return True, True
     else:
-        return False
+        return True, False
 
 def progress(start,end,solved):
     tosolve = end-start + 1
@@ -31,6 +32,7 @@ def progress(start,end,solved):
     return '{} {}/{}'.format(fancy ,solved,tosolve)
 
 def solve(problem):
+    start = time.time()
     print "Solving Problem #%d" % problem
     cmd = command(problem)
 
@@ -38,11 +40,14 @@ def solve(problem):
     out, err = p.communicate()
     if err != "":
         print "There was an error executing %s" % cmd
-        sys.exit(1)
+        return False, None, infinity
 
     answer = out.split("\n")[-2]
-    print "Problem Solved: %s" % answer
-    return answer
+    elapsed = time.time()-start
+
+    print "Problem Solved: %s %.2fs" % (answer.ljust(15),elapsed)
+
+    return True, answer, elapsed
 
 
 f = open(answerPath, "r")
@@ -75,19 +80,32 @@ elif len(sys.argv) == 2:
 
         end =  int(endpts[1])
         solved = 0
+        times = dict()
         for problem in xrange(start,end+1):
-            answer = solve(problem)
+            works, answer, times[problem] = solve(problem)
+ 
             message = "Incorrect."
-            if validate(lookup,problem,answer):
+            table, correct = validate(lookup,problem,answer)
+            if works and correct:
                 message = "Correct!"
                 solved += 1
+
                  
             print '{} {}'.format(message,progress(start,end,solved))
 
+        speed = sorted(range(start,end +1), key=lambda x:times[x])
+        show = "\n"
+        speed.reverse()
+        for problem in speed:
+            show += "%d (%.2fs), " % (problem, times[problem])
+        print show.rstrip(' ,')
+
     else: #just one problem is specified
         problem = int(sys.argv[1]) 
-        answer = solve(problem)
-        if validate(lookup,problem,answer):
+        works, answer, _ = solve(problem)
+        inTable, correct = validate(lookup,problem,answer)
+        if not inTable: sys.exit(1) #exit with error
+        if works and correct:
             print "Correct!"
         else:
             print "Incorrect."
