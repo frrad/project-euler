@@ -115,8 +115,8 @@ def divisors(n):
 
 #number of divisors (\sigma_0)
 def divisorSigma(n,k):
-    if k==0:
-        return divisors(n)
+    if n==1: return 1
+    if k==0: return divisors(n)
     fac = factors(n)
     d = 1
     for (p, a) in fac:
@@ -147,6 +147,7 @@ def palindrome(n):
 
 factorialCache = dict({1:1, 2:2})
 def factorial(n):
+    if n < 1: return 1 
     if n in factorialCache:
         return factorialCache[n]
     factorialCache[n]=factorial(n-1)*n

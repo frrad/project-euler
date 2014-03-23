@@ -1,6 +1,7 @@
+import euler
+
 def d(n):
-    divisors = [d for d in range(1,n) if n%d ==0]
-    return sum(divisors)
+    return euler.divisorSigma(n,1)-n
 
 def amicableQ(a):
     b = d(a)
@@ -10,4 +11,4 @@ def amicableQ(a):
         return True
     return False
 
-print sum([n for n in range(1,10000) if amicableQ(n)])
+print sum([n for n in range(2,10000) if amicableQ(n)])
