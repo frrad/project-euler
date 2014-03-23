@@ -355,6 +355,48 @@ func check(x int, ans string) (present, correct bool) {
 
 }
 
+func parse(spec string) (list []int, err bool) {
+	splitted := strings.Split(spec, "-")
+
+	if len(splitted) > 2 || len(splitted) < 1 {
+		return nil, true
+	}
+
+	if len(splitted) == 1 {
+		if pnumber, err := strconv.Atoi(os.Args[1]); err == nil {
+			return []int{pnumber}, false
+		} else {
+			return nil, true
+		}
+	}
+
+	a, b := 1, 1
+
+	if splitted[0] == "" {
+		if temp, err := strconv.Atoi(splitted[1]); err == nil {
+			b = temp
+		} else {
+			return nil, true
+		}
+	} else {
+		tempa, err1 := strconv.Atoi(splitted[0])
+		tempb, err2 := strconv.Atoi(splitted[1])
+		if err1 != nil || err2 != nil {
+			return nil, true
+		}
+
+		a, b = tempa, tempb
+
+	}
+
+	list = make([]int, b-a+1)
+	for i := range list {
+		list[i] = i + a
+	}
+
+	return
+}
+
 func main() {
 
 	client = &http.Client{}
@@ -377,41 +419,54 @@ func main() {
 		settings[key] = val
 	}
 
-	if len(os.Args) == 1 {
+	switch len(os.Args) {
+	case 1:
 		say("No arguments!", 0)
-	} else if len(os.Args) > 3 {
-		say("Too many arguments!", 0)
-	} else if len(os.Args) == 2 && os.Args[1] == "R" {
-		say("Updating Status:", 0)
-		getStatus()
-	} else if pnumber, err := strconv.Atoi(os.Args[1]); err == nil {
-		if len(os.Args) == 2 {
 
-			say("Solving #"+strconv.Itoa(pnumber), 1)
-			if works, mess, out := runProb(pnumber); works {
-				say("Answer: "+out, 1)
+	case 2:
+		//Only one argument
+		switch argue := os.Args[1]; argue {
 
-				if mess != "" { //time
-					say(mess, 2)
+		case "R":
+			say("Updating Status:", 0)
+			getStatus()
+
+		default:
+			if plist, err := parse(argue); err == false {
+
+				for _, pnumber := range plist {
+
+					say("Solving #"+strconv.Itoa(pnumber), 1)
+
+					if works, mess, out := runProb(pnumber); works {
+						say("Answer: "+out, 1)
+
+						if mess != "" { //time
+							say(mess, 2)
+						}
+
+						fancySubmit(pnumber, out)
+
+					} else {
+						fmt.Println(mess)
+					}
 				}
 
-				fancySubmit(pnumber, out)
-
 			} else {
-				fmt.Println(mess)
+				say("Can't parse argument!", 0)
 			}
 		}
-
-		if len(os.Args) == 3 {
+	case 3:
+		if pnumber, err := strconv.Atoi(os.Args[1]); err == nil {
 			out := os.Args[2]
 			say("Submitting: "+out, 1)
-
 			fancySubmit(pnumber, out)
-
+		} else {
+			say("Can't parse problem number!", 0)
 		}
+	default:
+		say("Too many arguments!", 0)
 
-	} else {
-		say("Invalid Arguments", 0)
 	}
 
 }
