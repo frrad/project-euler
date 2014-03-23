@@ -27,6 +27,16 @@ func Divisors(n int64) int64 {
 	return div
 }
 
+func DivisorSigma(n, k int64) int64 {
+	facs := Factors(n)
+	d := int64(1)
+	for _, tuple := range facs {
+		p, a := tuple[0], tuple[1]
+		d *= (IntExp(p, k*a+k) - 1) / (IntExp(p, k) - 1)
+	}
+	return d
+}
+
 //returns an ordered list of distinct factors
 func Factor(n int64) []int64 {
 	var answer = []int64{}

@@ -113,6 +113,17 @@ def divisors(n):
         d *= a+1
     return d
 
+#number of divisors (\sigma_0)
+def divisorSigma(n,k):
+    if k==0:
+        return divisors(n)
+    fac = factors(n)
+    d = 1
+    for (p, a) in fac:
+        d *= (p**(k * a +k) - 1) / (p**k - 1)
+    return d
+
+
 
 #######################
 ###Special Sequences###
