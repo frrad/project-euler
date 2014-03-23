@@ -1,9 +1,11 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"time"
+)
 
 const level = 10
-
 
 func chomp(numerator int, denominator int, height int) int {
 
@@ -18,23 +20,25 @@ func chomp(numerator int, denominator int, height int) int {
 }
 
 func main() {
+	starttime := time.Now()
 
-	record := 0
+	record, submit := 0, 0
 
 	for den := 2; den < 1000; den++ {
 
 		newmerator := chomp(1, den, level)
 
 		answer := 0
-		for j := 1; newmerator != chomp(newmerator, den, j); j++ {//this is pretty wasteful
+		for j := 1; newmerator != chomp(newmerator, den, j); j++ { //this is pretty wasteful
 			answer = j + 1
 		}
 		if answer > record {
-			record = answer
+			record, submit = answer, den
 			fmt.Println(den, ",", answer)
 		}
 
 	}
 
+	fmt.Println(submit)
+	fmt.Println("Elapsed time:", time.Since(starttime))
 }
-
