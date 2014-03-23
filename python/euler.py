@@ -86,6 +86,7 @@ def factors(n):
 
 
 def primeQ(n):
+    if n < 2: return False
     d = 2
     while d * d  <= n:
         if n % d == 0:
@@ -155,3 +156,24 @@ def factorial(n):
 
 def triangle(n):
     return n*(n+1)/2
+
+##############
+###ANALYSIS###
+##############
+
+def lagrange(points):
+    points = map(lambda list: map(float,list), points)
+    n = len(points)
+
+    def ans(x):
+        ans = 0
+        for j in range (n):
+            p = points[j][1]
+            for k in range (n):
+                if k == j: continue
+                p *= (x - points[k][0])/(points[j][0] - points[k][0])
+            
+            ans += p
+        return ans
+    
+    return ans
