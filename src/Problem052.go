@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func sortInt(input int) int {
@@ -29,8 +30,9 @@ func bubbleSort(word string) string {
 }
 
 func main() {
+	starttime := time.Now()
 
-	for i := 0; ; i++ {
+	for i := 1; ; i++ {
 		bench := sortInt(i)
 		if sortInt(2*i) == bench &&
 			sortInt(3*i) == bench &&
@@ -38,7 +40,9 @@ func main() {
 			sortInt(5*i) == bench &&
 			sortInt(6*i) == bench {
 			fmt.Println(i)
+			break
 		}
 	}
 
+	fmt.Println("Elapsed time:", time.Since(starttime))
 }

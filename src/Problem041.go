@@ -5,6 +5,7 @@ import (
 	"math"
 	"strconv"
 	"strings"
+	"time"
 )
 
 func sortInt(input int) int {
@@ -61,10 +62,16 @@ func isPandigital(n int) bool {
 }
 
 func main() {
-	for i := 0; i < 999999999; i++ {
+	starttime := time.Now()
+
+	top := 0
+	for i := 0; i < 9999999; i++ {
 		if isPandigital(i) && isPrime(i) {
-			fmt.Println(i)
+			top = i
 		}
 	}
 
+	fmt.Println(top)
+
+	fmt.Println("Elapsed time:", time.Since(starttime))
 }

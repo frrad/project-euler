@@ -450,6 +450,8 @@ func main() {
 					} else {
 						fmt.Println(mess)
 					}
+
+					fmt.Print("\n")
 				}
 
 			} else {
