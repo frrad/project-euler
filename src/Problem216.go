@@ -1,68 +1,85 @@
 package main
 
 import (
-	"euler"
 	"fmt"
-
+	"math/big"
 	"time"
 )
 
 const (
-	top  = 50000000
-	pTop = 4157407
-	// pTop is PrimePi[Floor[Sqrt[2]*50*10^6]]
+	top = 50000000
+	bar = 50
 )
+
+func progress(percent float32) string {
+	ans := "["
+	length := float32(bar)
+	for i := float32(0); i < length; i++ {
+		if i/length < percent {
+			ans += "X"
+		} else {
+			ans += " "
+		}
+	}
+	ans += "]"
+	return ans
+}
+
+func clear(n int) (ans string) {
+	for i := 0; i < n; i++ {
+		ans += "\b"
+	}
+	return
+}
 
 func main() {
 	starttime := time.Now()
 
-	fmt.Println("Building Cache")
-	euler.PrimeCache(pTop)
-	fmt.Println("Built:", time.Since(starttime))
+	two := big.NewInt(2)
+	one := big.NewInt(1)
 
-	seive := [top + 1]bool{}
-	for i := 2; i < top+1; i++ {
-		seive[i] = true
-	}
+	validate := make(map[int64]bool)
 
-	for i := int64(3); i < pTop; i++ {
-		p := euler.Prime(i)
+	for i := int64(2); i < top; i++ {
 
-		residue := (p + 1) / 2
+		if i%(top/bar) == 0 {
+			fmt.Printf("%s%s", clear(bar+2), progress(float32(i)/float32(top)))
+		}
 
-		//first we solve 2 n^2 - 1 = p  in F_p
-		//Too slow : use T-S
-		if an1, an2, ok := euler.SqrtMod(residue, p); ok {
-			fmt.Println(p)
+		val := big.NewInt(i)
 
-			point := an1
-			//This is slow too, don't check directly
-			for euler.IsPrime(point*point*2 - 1) {
-				point += p
-			}
-			for ; point < top+1; point += p {
-				seive[point] = false
-			}
+		val.Mul(val, val)
+		val.Mul(val, two)
+		val.Sub(val, one)
 
-			point = an2
-			for euler.IsPrime(point*point*2 - 1) {
-				point += p
-			}
-			for ; point < top+1; point += p {
-				seive[point] = false
-			}
-
+		if val.ProbablyPrime(1) {
+			validate[i] = true
 		}
 
 	}
 
-	count := 0
-	for i := range seive {
-		if seive[i] {
-			count++
+	fmt.Printf("\nFirst pass found %d primes. (Elapsed Time: %s)\n", len(validate), time.Since(starttime))
+
+	//max value of j found experimentally
+	for j := 2; j < 3; j++ {
+
+		for i := range validate {
+			val := big.NewInt(i)
+
+			val.Mul(val, val)
+			val.Mul(val, two)
+			val.Sub(val, one)
+
+			if !val.ProbablyPrime(j) {
+				delete(validate, i)
+			}
+
 		}
+
+		fmt.Printf("Pass %d found %d primes. (Elapsed Time: %s)\n", j, len(validate), time.Since(starttime))
 	}
-	fmt.Println(count)
+
+	fmt.Println(len(validate))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
