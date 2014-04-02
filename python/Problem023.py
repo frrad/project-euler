@@ -4,7 +4,7 @@ def isAbundant(n):
     pdsum = euler.divisorSigma(n,1) - n
     return pdsum > n
 
-top = 28123
+top = 20162
 abundant = []
 
 for x in range(10,top):
