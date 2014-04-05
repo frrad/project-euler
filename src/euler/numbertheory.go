@@ -1,6 +1,9 @@
 package euler
 
-import "math"
+import (
+	"math"
+	"math/big"
+)
 
 const (
 	primeTableLength = 50000000 //+1!!!!!!!!!!!
@@ -160,6 +163,25 @@ func Factors(n int64) [][2]int64 {
 		}
 	}
 	return factors
+}
+
+var bigFactorialCache = make(map[int]*big.Int)
+
+func BigFactorial(n int) *big.Int {
+	if n < 0 {
+		return big.NewInt(0)
+	}
+	if n < 2 {
+		return big.NewInt(1)
+	}
+	if ans, ok := bigFactorialCache[n]; ok {
+		//make a copy so user can't modify cache
+		ret := new(big.Int)
+		return ret.Set(ans)
+	}
+	ans := BigFactorial(n - 1)
+	bigFactorialCache[n] = ans.Mul(ans, big.NewInt(int64(n)))
+	return BigFactorial(n)
 }
 
 func Factorial(n int64) int64 {

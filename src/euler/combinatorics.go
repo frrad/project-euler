@@ -1,5 +1,81 @@
 package euler
 
+import "math/big"
+
+var sfcache = make(map[int]int64)
+
+//to compute derangements
+//overflows around 20-21
+func Subfactorial(n int) int64 {
+	if n == 0 {
+		return 1
+	}
+
+	if n <= 1 {
+		return 0
+	}
+
+	if ans, ok := sfcache[n]; ok {
+		return ans
+	}
+
+	ans := int64(n-1) * (Subfactorial(n-1) + Subfactorial(n-2))
+	sfcache[n] = ans
+
+	return Subfactorial(n)
+}
+
+var bigsfcache = make(map[int]*big.Int)
+
+//how many derangements of n letters
+func BigSubfactorial(n int) *big.Int {
+	if n == 0 {
+		return big.NewInt(1)
+	}
+
+	if n <= 1 {
+		return big.NewInt(0)
+	}
+
+	if ans, ok := bigsfcache[n]; ok {
+		//make a copy so user can't modify cache
+		ret := new(big.Int)
+		return ret.Set(ans)
+	}
+
+	d1 := BigSubfactorial(n - 1)
+	d2 := BigSubfactorial(n - 2)
+	n1 := big.NewInt(int64(n - 1))
+
+	d1.Add(d1, d2)
+	bigsfcache[n] = n1.Mul(d1, n1)
+
+	return BigSubfactorial(n)
+}
+
+var bigChooseCache = make(map[[2]int]*big.Int)
+
+func BigChoose(n, k int) *big.Int {
+	if k == 0 || k == n {
+		return big.NewInt(1)
+	}
+	if k < 0 || k > n {
+		return big.NewInt(0)
+	}
+
+	if ans, ok := bigChooseCache[[2]int{n, k}]; ok {
+		//make a copy so user can't modify cache
+		ret := new(big.Int)
+		return ret.Set(ans)
+	}
+
+	ans := BigChoose(n-1, k)
+	ans.Add(ans, BigChoose(n-1, k-1))
+
+	bigChooseCache[[2]int{n, k}] = ans
+	return BigChoose(n, k)
+}
+
 func Choose(N, K int64) int64 {
 	factors := make(map[int64]int64)
 
