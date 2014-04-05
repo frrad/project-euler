@@ -9,7 +9,7 @@ import (
 
 const (
 	path   = "../eulerdata/status.html"
-	prizes = 4
+	prizes = 5
 )
 
 var totals [prizes]int
@@ -19,6 +19,7 @@ var names = [prizes]string{
 	"Triangle Trophy",
 	"Lucky Luke\t",
 	"Decimation II\t",
+	"Ultimate Decimator",
 }
 
 var taglines = [prizes]string{
@@ -26,12 +27,14 @@ var taglines = [prizes]string{
 	"first triangle numbered problems",
 	"lucky numbered problems",
 	"rows",
+	"rows",
 }
 
 var goals = [prizes]int{
 	50,
 	25,
 	50,
+	10,
 	10,
 }
 
@@ -164,6 +167,21 @@ func main() {
 		}
 	}
 
+	//ULTIMATE DECIMATOR (Index = 4)
+	decStart = 300
+	for i := 0; i < 10; i++ {
+		here := 0
+		for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
+			if dict[j] {
+				here++
+			}
+		}
+
+		if here > 0 {
+			totals[4]++
+		}
+	}
+
 	fmt.Println("Done", done, "/", max, " problems")
 
 	for i := 0; i < lineL; i++ {
@@ -198,7 +216,7 @@ func main() {
 
 	track := make(map[int]int)
 
-	if totals[0] < 50 {
+	if totals[0] < goals[0] {
 		fmt.Print("Primes: ")
 		for i := 1; i < max; i++ {
 			if !dict[i] && euler.IsPrime(int64(i)) {
@@ -209,7 +227,7 @@ func main() {
 		fmt.Print("\n")
 	}
 
-	if totals[1] < 25 {
+	if totals[1] < goals[1] {
 		fmt.Print("Triangle Numbers: ")
 
 		for i := 1; i <= 25; i++ {
@@ -249,6 +267,30 @@ func main() {
 
 			if here == 0 {
 				for j := 200 + 10*i + 1; j < 200+10*(i+1)+1; j++ {
+					fmt.Print(j, " ")
+					track[j]++
+				}
+			}
+		}
+
+		fmt.Print("\n")
+	}
+
+	if totals[4] < goals[4] {
+		fmt.Print("Ultimate Decimator: ")
+
+		decStart = 300
+
+		for i := 0; i < 10; i++ {
+			here := 0
+			for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
+				if dict[j] {
+					here++
+				}
+			}
+
+			if here == 0 {
+				for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
 					fmt.Print(j, " ")
 					track[j]++
 				}
