@@ -2,6 +2,42 @@ package euler
 
 import "math/big"
 
+var parttable = make(map[int]int)
+
+//Recurrence equation for partition function, due to Euler
+func IntPartitions(n int) int {
+	if ans, ok := parttable[n]; ok {
+		return ans
+	}
+
+	if n == 0 {
+		parttable[0] = 1
+		return IntPartitions(0)
+	}
+
+	if n < 0 {
+		return 0
+	}
+
+	sum := 0
+
+	for k := 1; k <= n; k++ {
+		var summand int
+		if k%2 == 0 {
+			summand = -1
+		} else {
+			summand = 1
+		}
+
+		summand *= IntPartitions(n-(k*(3*k-1)/2)) + IntPartitions(n-(k*(3*k+1)/2))
+
+		sum += summand
+	}
+
+	parttable[n] = sum
+	return IntPartitions(n)
+}
+
 var sfcache = make(map[int]int64)
 
 //to compute derangements
