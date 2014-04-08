@@ -1,10 +1,6 @@
-//Implement special mathematical functions
-
 package euler
 
-import (
-//"fmt"
-)
+//Implement special mathematical functions
 
 func TriangleNumber(n int) int64 {
 	a := int64(n)
