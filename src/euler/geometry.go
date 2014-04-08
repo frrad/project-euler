@@ -1,9 +1,9 @@
-//Plane geometry support for Project Euler
 package euler
+
+//Plane geometry support for Project Euler
 
 import (
 	"errors"
-	// "fmt"
 	"math"
 )
 
@@ -22,7 +22,7 @@ type Triangle struct {
 
 type Line struct {
 	Slope, Intercept float64
-	vertical         bool
+	Vertical         bool
 }
 
 func (b *Point) Distance(a *Point) float64 {
@@ -31,6 +31,7 @@ func (b *Point) Distance(a *Point) float64 {
 	return math.Sqrt(dx*dx + dy*dy)
 }
 
+//LineFromPoints gives the line through the given points
 func LineFromPoints(a, b *Point) (*Line, error) {
 	if a.X == b.X && a.Y == b.Y {
 		return new(Line), errors.New("Can't make line: points are the same")
@@ -51,6 +52,8 @@ func LineFromPoints(a, b *Point) (*Line, error) {
 
 }
 
+//RightOf returns true if the given point is to the right of the line
+//(note: More accurately, point is "above" the line. Rename to that affect?)
 func (pt *Point) RightOf(line *Line) bool {
 
 	if line.Evaluate(pt.X) < pt.Y {
@@ -60,11 +63,15 @@ func (pt *Point) RightOf(line *Line) bool {
 	return false
 }
 
+//LineFromPtSlope returns a line object having the provided point and slope.
+//(note: maybe rename to NewLine or NewLineMXB)
 func LineFromPtSlope(slope float64, x *Point) *Line {
 	b := x.Y - slope*x.X
 	return &Line{slope, b, false}
 }
 
+//IntersectLine returns the point where the given lines intersect. If they don't
+//intersect, it returns an error (note: vertical line support is not yet implemented)
 func (l *Line) IntersectLine(m *Line) (intersection *Point, err error) {
 	if l.Slope == m.Slope {
 		if l.Intercept == m.Intercept {
@@ -74,9 +81,8 @@ func (l *Line) IntersectLine(m *Line) (intersection *Point, err error) {
 		}
 	}
 
-	if m.vertical == true || l.vertical == true {
+	if m.Vertical == true || l.Vertical == true {
 		return new(Point), errors.New("Vertical Lines!!")
-
 	}
 
 	x := (m.Intercept - l.Intercept) / (l.Slope - m.Slope)
@@ -85,6 +91,8 @@ func (l *Line) IntersectLine(m *Line) (intersection *Point, err error) {
 	return &Point{x, y}, nil
 }
 
+//CircleFromPoints returns the unique circle through the provided points,
+//provided such exists.
 func CircleFromPoints(a, b, c *Point) (*Circle, error) {
 	tri := MakeTriange(a, b, c)
 	trarea := tri.Area()
@@ -111,7 +119,8 @@ func CircleFromPoints(a, b, c *Point) (*Circle, error) {
 	return &Circle{Point{center.X, center.Y}, radius}, nil
 }
 
-//perpendicular bisector to line through x,y
+//Bisect returns the line which is the perpendicular bisector to the segment
+//through ponts x, and y.
 func Bisect(x, y *Point) (*Line, error) {
 	through, err := LineFromPoints(x, y)
 	if err != nil {

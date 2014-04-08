@@ -1,29 +1,34 @@
 package main
 
 import (
-	"./euler"
 	"fmt"
+	"math/big"
+	"time"
 )
 
+const top = 1000
+
 func main() {
+	starttime := time.Now()
 
-	num := "2"
+	frac := big.NewRat(2, 1)
+	n, d := frac.Num(), frac.Denom()
+	table := big.NewInt(0)
 
-	den := "1"
+	two := big.NewRat(2, 1)
 
-	total := 0
-	counter := 2
+	var total int
 
-	for i := 0; i < 1005; i++ {
+	for i := 0; i < top; i++ {
+		frac.Add(two, frac.Inv(frac))
 
-		num, den = euler.StringFastFracAdd("2", "1", den, num)
-		if len(euler.StringSum(num, den)) > len(num) {
+		if len(table.Add(n, d).String()) > len(n.String()) {
 			total++
-			fmt.Println(euler.StringSum(num, den), num, ": (", total, "/", counter, ")")
-
 		}
-		counter++
 
 	}
 
+	fmt.Printf("%d\n", total)
+
+	fmt.Println("Elapsed time:", time.Since(starttime))
 }
