@@ -38,6 +38,21 @@ var goals = [prizes]int{
 	10,
 }
 
+var prizeFns = make([]func(map[int]bool) (int, map[int]bool), prizes)
+
+func show(set map[int]bool, howHard map[int]int) string {
+	ans := ""
+	for i := 0; i < max; i++ {
+		if set[i] {
+			ans += strconv.Itoa(i)
+			ans += "("
+			ans += strconv.Itoa(howHard[i])
+			ans += ") "
+		}
+	}
+	return ans
+}
+
 func getNum(a string) int {
 	probLen := 8 //Length of `Problem '
 
@@ -83,13 +98,126 @@ func luckySeive(max int) []int {
 	return luckyseive
 }
 
+func howHard(text string) int {
+	start := strings.Index(text, "solved by")
+	start += 10 //length of "solved by"
+	text = text[start:]
+
+	end := strings.Index(text, "members")
+	text = text[:end-1]
+
+	//fmt.Printf("%s\n\n\n", text)
+
+	ans, err := strconv.Atoi(text)
+	if err == nil {
+		//fmt.Printf("$d\n", ans)
+		return ans
+	}
+
+	fmt.Printf("ERROR: %s\n", err)
+	return 0
+}
+
+var max int = -1 //number of problems total
+
 func main() {
-	lineL := 60
+
+	prizeFns[0] = func(dict map[int]bool) (ans int, set map[int]bool) {
+		set = make(map[int]bool)
+		//PRIME NUMBERS (Index = 0)
+		for i := 1; i <= max; i++ {
+			if dict[i] {
+				if euler.IsPrime(int64(i)) {
+					ans++
+				}
+			} else if euler.IsPrime(int64(i)) {
+				set[i] = true
+			}
+		}
+		return
+	}
+
+	prizeFns[1] = func(dict map[int]bool) (ans int, set map[int]bool) {
+		set = make(map[int]bool)
+		//TRIANGLE NUMBERS (Index = 1)
+		for i := 1; i <= 25; i++ {
+			if dict[i*(i+1)/2] {
+				ans++
+			} else {
+				set[i*(i+1)/2] = true
+			}
+		}
+		return
+	}
+
+	prizeFns[2] = func(dict map[int]bool) (ans int, set map[int]bool) {
+		set = make(map[int]bool)
+		//LUCKY NUMBER (Index = 2)
+		luckyseive := luckySeive(max)
+		for i := 0; i < len(luckyseive); i++ {
+			if dict[luckyseive[i]] {
+				ans++
+			} else {
+				set[luckyseive[i]] = true
+			}
+		}
+		return
+	}
+
+	prizeFns[3] = func(dict map[int]bool) (ans int, set map[int]bool) {
+		set = make(map[int]bool)
+		//DECIMATION II (Index = 3)
+		decStart := 200
+		for i := 0; i < 10; i++ {
+			here := 0
+			for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
+				if dict[j] {
+					here++
+				}
+			}
+
+			if here > 0 {
+				ans++
+			} else {
+
+				for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
+					set[j] = true
+				}
+			}
+		}
+		return
+	}
+
+	prizeFns[4] = func(dict map[int]bool) (ans int, set map[int]bool) {
+		set = make(map[int]bool)
+		//ULTIMATE DECIMATOR (Index = 4)
+		decStart := 300
+		for i := 0; i < 10; i++ {
+			here := 0
+			for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
+				if dict[j] {
+					here++
+				}
+			}
+
+			if here > 0 {
+				ans++
+			} else {
+
+				for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
+					set[j] = true
+				}
+			}
+		}
+		return
+	}
+
+	lineL := 40
 
 	page := euler.Import(path)
 
-	max := -1 //number of problems total
 	dict := make(map[int]bool)
+	difficulty := make(map[int]int)
 
 	for _, line := range page {
 		split := strings.Split(line, "vertical-align:middle;background-color:#")
@@ -98,8 +226,8 @@ func main() {
 			if len(prob) > 5 {
 				if prob[:6] == "CEE7B6" {
 					//Green = Complete
-
 					number := getNum(prob)
+					difficulty[number] = howHard(prob)
 					dict[number] = true
 					if number > max {
 						max = number
@@ -107,8 +235,8 @@ func main() {
 
 				} else if prob[:3] == "fff" {
 					//White = Incomplete
-
 					number := getNum(prob)
+					difficulty[number] = howHard(prob)
 					if number > max {
 						max = number
 					}
@@ -118,68 +246,15 @@ func main() {
 		}
 	}
 
-	/*
-		//Set all to complete for testing
-		for i := 1; i <= max; i++ {
-			dict[i] = true
-		}
-	*/
-
 	done := 0
-
-	//PRIME NUMBERS (Index = 0)
 	for i := 1; i <= max; i++ {
 		if dict[i] {
 			done++
-			if euler.IsPrime(int64(i)) {
-				totals[0]++
-			}
 		}
 	}
 
-	//TRIANGLE NUMBERS (Index = 1)
-	for i := 1; i <= 25; i++ {
-		if dict[i*(i+1)/2] {
-			totals[1]++
-		}
-	}
-
-	//LUCKY NUMBER (Index = 2)
-	luckyseive := luckySeive(max)
-	for i := 0; i < len(luckyseive); i++ {
-		if dict[luckyseive[i]] {
-			totals[2]++
-		}
-	}
-
-	//DECIMATION II (Index = 3)
-	decStart := 200
-	for i := 0; i < 10; i++ {
-		here := 0
-		for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
-			if dict[j] {
-				here++
-			}
-		}
-
-		if here > 0 {
-			totals[3]++
-		}
-	}
-
-	//ULTIMATE DECIMATOR (Index = 4)
-	decStart = 300
-	for i := 0; i < 10; i++ {
-		here := 0
-		for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
-			if dict[j] {
-				here++
-			}
-		}
-
-		if here > 0 {
-			totals[4]++
-		}
+	for i := 0; i < prizes; i++ {
+		totals[i], _ = prizeFns[i](dict)
 	}
 
 	fmt.Println("Done", done, "/", max, " problems")
@@ -216,88 +291,17 @@ func main() {
 
 	track := make(map[int]int)
 
-	if totals[0] < goals[0] {
-		fmt.Print("Primes: ")
-		for i := 1; i < max; i++ {
-			if !dict[i] && euler.IsPrime(int64(i)) {
-				fmt.Print(i, " ")
+	for pNum := 1; pNum <= 4; pNum++ {
+
+		if totals[pNum] < goals[pNum] {
+			_, set := prizeFns[pNum](dict)
+			fmt.Printf("%s: %s\n", names[pNum], show(set, difficulty))
+
+			for i, _ := range set {
 				track[i]++
 			}
+
 		}
-		fmt.Print("\n")
-	}
-
-	if totals[1] < goals[1] {
-		fmt.Print("Triangle Numbers: ")
-
-		for i := 1; i <= 25; i++ {
-			if !dict[i*(i+1)/2] {
-				fmt.Print(i*(i+1)/2, " ")
-				track[i*(i+1)/2]++
-			}
-		}
-
-		fmt.Print("\n")
-
-	}
-
-	if totals[2] < 50 {
-		fmt.Print("Lucky Numbers: ")
-
-		for i := 0; i < len(luckyseive); i++ {
-			if !dict[luckyseive[i]] {
-				fmt.Print(luckyseive[i], " ")
-				track[luckyseive[i]]++
-			}
-		}
-
-		fmt.Print("\n")
-	}
-
-	if totals[3] < 10 {
-		fmt.Print("Decimation II: ")
-
-		for i := 0; i < 10; i++ {
-			here := 0
-			for j := 200 + 10*i + 1; j < 200+10*(i+1)+1; j++ {
-				if dict[j] {
-					here++
-				}
-			}
-
-			if here == 0 {
-				for j := 200 + 10*i + 1; j < 200+10*(i+1)+1; j++ {
-					fmt.Print(j, " ")
-					track[j]++
-				}
-			}
-		}
-
-		fmt.Print("\n")
-	}
-
-	if totals[4] < goals[4] {
-		fmt.Print("Ultimate Decimator: ")
-
-		decStart = 300
-
-		for i := 0; i < 10; i++ {
-			here := 0
-			for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
-				if dict[j] {
-					here++
-				}
-			}
-
-			if here == 0 {
-				for j := decStart + 10*i + 1; j < decStart+10*(i+1)+1; j++ {
-					fmt.Print(j, " ")
-					track[j]++
-				}
-			}
-		}
-
-		fmt.Print("\n")
 	}
 
 	maxTrack := -1
@@ -316,15 +320,13 @@ func main() {
 
 	fmt.Print("\n")
 
-	fmt.Print("Most Repeated: ")
-
+	set := make(map[int]bool)
 	for i := 1; i <= max; i++ {
 		if track[i] == maxTrack {
-			fmt.Print(i, " ")
-
+			set[i] = true
 		}
-
 	}
+	fmt.Printf("Most Repeated (%d): %s", maxTrack, show(set, difficulty))
 
 	fmt.Print("\n")
 

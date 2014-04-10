@@ -120,7 +120,8 @@ func main() {
 			}
 
 			if len(x) >= record {
-				fmt.Println("d=", rad, ":", x)
+				fmt.Printf("d=%d\t:%s\n", rad, x)
+
 				record, bestD = len(x), rad
 			}
 
