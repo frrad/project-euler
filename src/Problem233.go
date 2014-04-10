@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./euler"
+	"euler"
 	"fmt"
 	"strconv"
 	"time"
@@ -13,7 +13,9 @@ func isSmall(str string) bool {
 	}
 	return true
 }
-func isMultiple(n int64) bool { //returns true if there are no pythagorean prime factors
+
+//returns true if there are no pythagorean prime factors
+func isMultiple(n int64) bool {
 	for _, factor := range euler.Factor(n) {
 		if factor%4 == 1 {
 			return false
@@ -21,6 +23,7 @@ func isMultiple(n int64) bool { //returns true if there are no pythagorean prime
 	}
 	return true
 }
+
 func lastSmall(table []string, multiple string) int {
 	min := 0
 	max := len(table)
@@ -33,6 +36,7 @@ func lastSmall(table []string, multiple string) int {
 	}
 	return min
 }
+
 func main() {
 	starttime := time.Now()
 

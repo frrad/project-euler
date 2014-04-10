@@ -1,23 +1,26 @@
 package main
 
 import (
-	"./euler"
+	"euler"
 	"fmt"
-	"strconv"
+	"math/big"
+	"time"
 )
 
 func ctdFrac(list []int) (num string, den string) {
-	num = strconv.Itoa(list[len(list)-1])
-	den = "1"
+	current := big.NewRat(int64(list[len(list)-1]), 1)
 
 	for i := len(list) - 2; i >= 0; i-- {
+		contrib := big.NewRat(int64(list[i]), 1)
 
-		num, den = euler.StringFastFracAdd(strconv.Itoa(list[i]), "1", den, num)
+		current.Inv(current)
+		current.Add(current, contrib)
 
-		fmt.Println(num, den)
+		fmt.Printf("%s\n", current)
+
 	}
 
-	return
+	return current.Num().String(), current.Denom().String()
 }
 
 func eList(n int) []int {
@@ -38,10 +41,10 @@ func eList(n int) []int {
 }
 
 func main() {
-
-	fmt.Println(euler.StringSum("0", "2345654322"))
+	starttime := time.Now()
 
 	numerator, _ := ctdFrac(eList(100))
 	fmt.Println(euler.StringDigitSum(numerator))
 
+	fmt.Println("Elapsed time:", time.Since(starttime))
 }

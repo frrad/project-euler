@@ -1,24 +1,25 @@
 package main
 
 import (
-	"./euler"
+	"euler"
 	"fmt"
 	"math"
-	"strconv"
+	"math/big"
 	"time"
 )
 
-func ctdFrac(list []int) (num string, den string) {
-	num = strconv.Itoa(list[len(list)-1])
-	den = "1"
+func ctdFrac(list []int) (string, string) {
+	current := big.NewRat(int64(list[len(list)-1]), 1)
+	temp := big.NewRat(0, 1)
 
 	for i := len(list) - 2; i >= 0; i-- {
+		temp.SetFrac64(int64(list[i]), 1)
+		current.Inv(current)
 
-		num, den = euler.StringFastFracAdd(strconv.Itoa(list[i]), "1", den, num)
-
+		current.Add(current, temp)
 	}
 
-	return
+	return current.Num().String(), current.Denom().String()
 }
 
 //fraction of the form (a +  b \sqrt R) / d
@@ -81,7 +82,7 @@ func isSquare(n int) bool {
 func main() {
 	starttime := time.Now()
 
-	record := 0
+	record, bestD := 0, 0
 
 	for rad := 2; rad <= 1000; rad++ {
 
@@ -120,11 +121,13 @@ func main() {
 
 			if len(x) >= record {
 				fmt.Println("d=", rad, ":", x)
-				record = len(x)
+				record, bestD = len(x), rad
 			}
 
 		}
 	}
+
+	fmt.Printf("%d\n", bestD)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 

@@ -1,13 +1,12 @@
 package euler
 
+//Working to remove! Using math/big for all this functionality now.
+
 import (
 	"strconv"
 )
 
-func StringFastFracAdd(num1 string, den1 string, num2 string, den2 string) (string, string) {
-	return StringSum(StringProd(num1, den2), StringProd(num2, den1)), StringProd(den1, den2)
-}
-
+//Probably will leave this after purge
 func StringDigitSum(str string) (total int) {
 	for i := 0; i < len(str); i++ {
 		is, _ := strconv.Atoi(str[i : i+1])

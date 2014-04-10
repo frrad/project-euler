@@ -5,21 +5,20 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	"strconv"
 	"time"
 )
 
 func ctdFrac(list []int) (num string, den string) {
-	num = strconv.Itoa(list[len(list)-1])
-	den = "1"
+	current := big.NewRat(int64(list[len(list)-1]), 1)
 
 	for i := len(list) - 2; i >= 0; i-- {
+		contrib := big.NewRat(int64(list[i]), 1)
 
-		num, den = euler.StringFastFracAdd(strconv.Itoa(list[i]), "1", den, num)
-
+		current.Inv(current)
+		current.Add(current, contrib)
 	}
 
-	return
+	return current.Num().String(), current.Denom().String()
 }
 
 //fraction of the form (a +  b \sqrt R) / d
@@ -70,22 +69,6 @@ func nextFrac(F frac) (n int, next frac) {
 	return
 }
 
-func isSquare(n int) bool {
-	sqrt := int(math.Sqrt(float64(n)))
-	if sqrt*sqrt == n {
-		return true
-	}
-	return false
-}
-
-func sumDigits(word string) (total int) {
-	for i := 0; i < len(word); i++ {
-		digit, _ := strconv.Atoi(word[i : i+1])
-		total += digit
-	}
-	return
-}
-
 //"Pell Equation"
 func main() {
 	starttime := time.Now()
@@ -93,7 +76,7 @@ func main() {
 	total := 0
 	for rad := 2; rad <= 100; rad++ {
 
-		if !isSquare(rad) {
+		if !euler.IsSquare(int64(rad)) {
 
 			convergentList := make([]int, 1)
 
@@ -120,7 +103,7 @@ func main() {
 
 			deciString := r.FloatString(105) //A bit too long in order to avoid rounding
 
-			total += sumDigits(deciString[:101]) //The extra 1 is the decimal point
+			total += euler.StringDigitSum(deciString[:101]) //The extra 1 is the decimal point
 		}
 	}
 
