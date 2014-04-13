@@ -46,11 +46,27 @@ func show(set map[int]bool, howHard map[int]int) string {
 		if set[i] {
 			ans += strconv.Itoa(i)
 			ans += "("
-			ans += strconv.Itoa(howHard[i])
+			ans += colorize(strconv.Itoa(howHard[i]), howHard[i])
 			ans += ") "
 		}
 	}
 	return ans
+}
+
+const EASY int = 1000
+const MEDIUM int = 500
+
+func colorize(text string, score int) string {
+	if score > EASY {
+		return "\033[01;32m" + text + "\033[00m"
+	}
+
+	if score > MEDIUM {
+		return "\033[1;33m" + text + "\033[00m"
+	}
+
+	return "\033[1;31m" + text + "\033[00m"
+
 }
 
 func getNum(a string) int {
@@ -122,9 +138,9 @@ var max int = -1 //number of problems total
 
 func main() {
 
+	//PRIME NUMBERS (Index = 0)
 	prizeFns[0] = func(dict map[int]bool) (ans int, set map[int]bool) {
 		set = make(map[int]bool)
-		//PRIME NUMBERS (Index = 0)
 		for i := 1; i <= max; i++ {
 			if dict[i] {
 				if euler.IsPrime(int64(i)) {
@@ -137,9 +153,9 @@ func main() {
 		return
 	}
 
+	//TRIANGLE NUMBERS (Index = 1)
 	prizeFns[1] = func(dict map[int]bool) (ans int, set map[int]bool) {
 		set = make(map[int]bool)
-		//TRIANGLE NUMBERS (Index = 1)
 		for i := 1; i <= 25; i++ {
 			if dict[i*(i+1)/2] {
 				ans++
@@ -150,9 +166,9 @@ func main() {
 		return
 	}
 
+	//LUCKY NUMBER (Index = 2)
 	prizeFns[2] = func(dict map[int]bool) (ans int, set map[int]bool) {
 		set = make(map[int]bool)
-		//LUCKY NUMBER (Index = 2)
 		luckyseive := luckySeive(max)
 		for i := 0; i < len(luckyseive); i++ {
 			if dict[luckyseive[i]] {
@@ -164,9 +180,9 @@ func main() {
 		return
 	}
 
+	//DECIMATION II (Index = 3)
 	prizeFns[3] = func(dict map[int]bool) (ans int, set map[int]bool) {
 		set = make(map[int]bool)
-		//DECIMATION II (Index = 3)
 		decStart := 200
 		for i := 0; i < 10; i++ {
 			here := 0
@@ -188,9 +204,9 @@ func main() {
 		return
 	}
 
+	//ULTIMATE DECIMATOR (Index = 4)
 	prizeFns[4] = func(dict map[int]bool) (ans int, set map[int]bool) {
 		set = make(map[int]bool)
-		//ULTIMATE DECIMATOR (Index = 4)
 		decStart := 300
 		for i := 0; i < 10; i++ {
 			here := 0
@@ -295,7 +311,7 @@ func main() {
 
 		if totals[pNum] < goals[pNum] {
 			_, set := prizeFns[pNum](dict)
-			fmt.Printf("%s: %s\n", names[pNum], show(set, difficulty))
+			fmt.Printf("%s: %s\n\n", names[pNum], show(set, difficulty))
 
 			for i, _ := range set {
 				track[i]++
@@ -306,21 +322,19 @@ func main() {
 
 	maxTrack := -1
 
-	fmt.Print("\nRepeats: ")
+	set := make(map[int]bool)
 
 	for i := 1; i <= max; i++ {
 		if track[i] > 1 {
-			fmt.Print(i, " ")
-
+			set[i] = true
 		}
 		if track[i] > maxTrack {
 			maxTrack = track[i]
 		}
 	}
+	fmt.Printf("Repeats: %s\n", show(set, difficulty))
 
-	fmt.Print("\n")
-
-	set := make(map[int]bool)
+	set = make(map[int]bool)
 	for i := 1; i <= max; i++ {
 		if track[i] == maxTrack {
 			set[i] = true
