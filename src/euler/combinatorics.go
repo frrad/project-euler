@@ -4,7 +4,8 @@ import "math/big"
 
 var parttable = make(map[int]int)
 
-//Recurrence equation for partition function, due to Euler
+//IntPartitions returns the number of partitions of n objects into groups of 1
+//or more. Currently implemented using a recurrence relation, due to Euler.
 func IntPartitions(n int) int {
 	if ans, ok := parttable[n]; ok {
 		return ans
@@ -40,8 +41,10 @@ func IntPartitions(n int) int {
 
 var sfcache = make(map[int]int64)
 
-//to compute derangements
-//overflows around 20-21
+//SubFactorial(n) gives the subfactorial of n (i.e. !n). This is also the number
+//of permutations of n elements, fixing none of them (derangements). The output
+//starts to overflow near !20 or !21. (See BigSubFactorial for big.Int
+//implementation.
 func Subfactorial(n int) int64 {
 	if n == 0 {
 		return 1
@@ -63,7 +66,8 @@ func Subfactorial(n int) int64 {
 
 var bigsfcache = make(map[int]*big.Int)
 
-//how many derangements of n letters
+//BigSubfactorial is the same as SubFactorial, but returns a big.Int object to
+//avoid overflow issues.
 func BigSubfactorial(n int) *big.Int {
 	if n == 0 {
 		return big.NewInt(1)
@@ -91,6 +95,9 @@ func BigSubfactorial(n int) *big.Int {
 
 var bigChooseCache = make(map[[2]int]*big.Int)
 
+//BigChoose(n,k) is equivalent to "n choose k." Binomial coefficients are
+//currently computed using a recursive, "Pascal's Triangle" approach (with
+//memoization).
 func BigChoose(n, k int) *big.Int {
 	if k == 0 || k == n {
 		return big.NewInt(1)
@@ -112,6 +119,9 @@ func BigChoose(n, k int) *big.Int {
 	return BigChoose(n, k)
 }
 
+//Choose(n,k) gives "n choose k." Currently implemented using a version of the
+//factorial formula, but working with prime decompositions to avoid integer
+//overflow in intermediate steps.
 func Choose(N, K int64) int64 {
 	factors := make(map[int64]int64)
 
@@ -151,7 +161,8 @@ func Choose(N, K int64) int64 {
 	return answer
 }
 
-//returns the nth permutation of the given slice
+//Permutation returns the nth permutation of a slice of integer
+//values. Undefined behavior for n > (len(list) factorial).
 func Permutation(n int, list []int) []int {
 	if len(list) == 1 {
 		return list
@@ -165,9 +176,10 @@ func Permutation(n int, list []int) []int {
 	copy(next, append(list[:k], list[k+1:]...))
 
 	return append(first, Permutation(n/len(list), next)...)
-
 }
 
+//PermuteFloats is just like Permutation, but for slices of float64 values. It
+//returns the nth permutation of the given slice.
 func PermuteFloats(n int, list []float64) []float64 {
 	if len(list) == 1 {
 		return list
@@ -181,9 +193,10 @@ func PermuteFloats(n int, list []float64) []float64 {
 	copy(next, append(list[:k], list[k+1:]...))
 
 	return append(first, PermuteFloats(n/len(list), next)...)
-
 }
 
+//PermuteString returns the nth permutation of the supplied string
+//(cf. Permutation, and PermuteFloats).
 func PermuteString(n int, word string) string {
 	if len(word) == 1 {
 		return word
@@ -251,8 +264,10 @@ func SplitSeq(K, N int) (a []int) {
 	return indices
 }
 
-//returns which permutation takes a->b, or -1
-//NOTE: THIS IS A TERRIBLE ALGORITHM -- Fix later
+//UnPermuteStrings returns the index of the first permutation which takes a to
+//b. That is, it finds n which has PermuteString(n, a) == b. Returns -1 on
+//failure. Current implementation is just brute force: could be substantially
+//improved if necessary.
 func UnPermuteStrings(a, b string) int {
 	for i := 0; i < int(Factorial(int64(len(a)))); i++ {
 		if PermuteString(i, a) == b {
