@@ -7,7 +7,11 @@ import (
 	"time"
 )
 
-const top int = 5
+const (
+	top  int = 20
+	mod      = 1000000000 //10^9
+	ones     = 111111111  // nine 1s
+)
 
 //return all strictly decreasing sets of numbers at most max, and at least 0 of
 //length lth whose squares sum to target
@@ -43,52 +47,6 @@ func enumerate(max, lth, target int) (ans [][]int, ok bool) {
 	return
 }
 
-//gives the sum of all digits appearing in a `following' place, with appropriate
-//multiplicities.
-func following(in []int) int64 {
-	delta := int64(0)
-
-	state := compress(in)
-	places := len(in)
-
-	zeroes := 0
-	if state[0][0] == 0 {
-		zeroes = state[0][1]
-	}
-
-	if zeroes+1 >= places {
-		return 0
-	}
-
-	//index of first nonzero elt
-	nonzero := 0
-	if state[0][0] == 0 {
-		nonzero++
-	}
-
-	places-- //our distinguished element takes a place
-
-	for i := nonzero; i < len(state); i++ {
-
-		multiplicity := int64(1)
-		available := places
-		multiplicity *= euler.Choose(int64(places-1), int64(zeroes))
-		available -= zeroes
-		for j := nonzero; j < len(state); j++ {
-			if j != i {
-				multiplicity *= euler.Choose(int64(available), int64(state[j][1]))
-				available -= state[j][1]
-			} else {
-				multiplicity *= euler.Choose(int64(available), int64(state[j][1]-1))
-				available -= (state[j][1] - 1)
-			}
-		}
-		delta += multiplicity * int64(state[i][0])
-
-	}
-	return delta
-}
-
 func paint(topaint [][]int, color int) [][]int {
 	ans := make([][]int, 0)
 	for _, strip := range topaint {
@@ -109,41 +67,53 @@ func compress(input []int) [][2]int {
 			pointer++
 		}
 	}
-
 	return ans
+}
+
+func process(way []int) int64 {
+	comp := compress(way)
+	size := int64(len(way))
+	choices := int64(1)
+
+	for i := 0; i < len(comp); i++ {
+		choices *= euler.Choose(size, int64(comp[i][1]))
+		size -= int64(comp[i][1])
+	}
+
+	delta := int64(0)
+	for i := 0; i < len(comp); i++ {
+		delta += int64(comp[i][1]) * int64(comp[i][0])
+		delta %= mod
+	}
+
+	delta *= choices
+	delta /= int64(len(way))
+	delta %= mod
+
+	delta = (delta * ones)
+	delta %= mod
+
+	return delta
 }
 
 func main() {
 	starttime := time.Now()
 
 	hittable := make(map[int]bool)
+	ans := int64(0)
 
-	potato := top * 9 * 9
-
-	count := 0
-
-	for i := 1; i*i <= potato; i++ {
+	for i := 1; i*i <= top*9*9; i++ {
 		hittable[i*i] = true
 	}
 
-	fmt.Println(hittable)
-
 	for i := range hittable {
-
 		ways, _ := enumerate(9, top, i)
-
-		fmt.Println(i, len(ways))
-		count += len(ways)
-
+		for i := 0; i < len(ways); i++ {
+			ans += process(ways[i])
+			ans %= mod
+		}
 	}
 
-	fmt.Printf("Count: %d\n", count)
-
-	//	example, _ := enumerate(9, top, 25)
-	exemplary := []int{0, 0, 0, 0, 3, 4}
-	//	exemplary := example[0]
-
-	fmt.Printf("%d\n%d\n", exemplary, following(exemplary))
-
+	fmt.Println(ans)
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
