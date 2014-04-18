@@ -82,6 +82,9 @@ func getNum(a string) int {
 }
 
 func luckySeive(max int) []int {
+
+	//fmt.Printf("Debug: %d\n", max)
+
 	luckyseive := make([]int, max)
 	for i := 0; i < max; i++ {
 		luckyseive[i] = i + 1
@@ -236,12 +239,12 @@ func main() {
 	difficulty := make(map[int]int)
 
 	for _, line := range page {
-		split := strings.Split(line, "vertical-align:middle;background-color:#")
+		split := strings.Split(line, "class=\"problem")
 		for _, prob := range split {
 
-			if len(prob) > 5 {
-				if prob[:6] == "CEE7B6" {
-					//Green = Complete
+			if len(prob) >= 9 {
+				if prob[:7] == "_solved" {
+					//fmt.Printf("Debug (solved): %s\n", prob)
 					number := getNum(prob)
 					difficulty[number] = howHard(prob)
 					dict[number] = true
@@ -249,8 +252,7 @@ func main() {
 						max = number
 					}
 
-				} else if prob[:3] == "fff" {
-					//White = Incomplete
+				} else if prob[:9] == "_unsolved" {
 					number := getNum(prob)
 					difficulty[number] = howHard(prob)
 					if number > max {
