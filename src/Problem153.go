@@ -17,33 +17,27 @@ func (z *gauss) squareNorm() int {
 	return z.r*z.r + z.i*z.i
 }
 
-func (z *gauss) conjugate() *gauss {
-	return &gauss{z.r, -z.i}
-}
-
-//product, assuming totally real
-func (z *gauss) times(w *gauss) int {
-	return z.r*w.r - z.i*w.i
-}
-
-func (z *gauss) scale(n int) *gauss {
-	return &gauss{n * z.r, n * z.i}
-}
+var cheat = make(map[int]int)
 
 func line(z *gauss) (total int) {
-	w := z.conjugate()
+	mag := z.squareNorm()
 
-	for a := 1; z.times(w.scale(a)) <= top; a++ {
-		for b := a; z.scale(b).times(w.scale(a)) <= top; b++ {
-			//fmt.Printf("%d-%d \n", a, b)
-
-			if b == a {
-				total += z.r * a
-			} else {
-				total += z.r * (a + b)
+	if ans, ok := cheat[top/mag]; ok {
+		total = ans
+	} else {
+		for a := 1; mag*a <= top; a++ {
+			for b := a; b*a*mag <= top; b++ {
+				if b == a {
+					total += a
+				} else {
+					total += (a + b)
+				}
 			}
 		}
+		cheat[top/mag] = total
 	}
+
+	total *= z.r
 
 	if z.i > 0 {
 		total *= 2
@@ -64,15 +58,14 @@ func main() {
 			if euler.GCD(int64(z.i), int64(z.r)) != 1 {
 				continue
 			}
-			//fmt.Println(z)
-			//fmt.Printf("%d\n", z.squareNorm())
 			delta := line(&z)
 			ans += delta
-			fmt.Printf("delta: %d\t total:%d\t\t %d+%di\n", delta, ans, z.r, z.i)
-
 		}
+		//fmt.Printf("(%d) total:%d\t\t %d+%di\n", len(cheat), ans, z.r, z.i)
 		z.i = 0
 	}
+
+	fmt.Println(ans)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
