@@ -8,24 +8,24 @@ import (
 
 const top int64 = 1000000000
 
-func accum(from, to int64, store *big.Int, isOdd bool, eval func(int64, int64) bool) {
+func accum(to int64, isOdd bool, eval func(int64, int64) bool) *big.Int {
 	point := int64(0)
-	for i := from; i <= to; i++ {
+	store := big.NewInt(0)
+	value := big.NewInt(0)
+
+	for i := int64(0); i <= to; i++ {
 		for eval(i, point+1) {
 			point++
 		}
-		//		fmt.Printf("Found %d->%d\n", i, point)
-		value := big.NewInt(point)
-		store.Add(store, value)
-		store.Add(store, value)
-		store.Add(store, value)
-		store.Add(store, value)
+		store.Add(store, value.SetInt64(point))
 	}
+
+	store.Mul(store, big.NewInt(4))
 	if isOdd {
-		store.Add(store, big.NewInt(point*-1))
-		store.Add(store, big.NewInt(point*-1))
+		store.Add(store, big.NewInt(-2*point))
+
 	}
-	return
+	return store
 }
 
 func main() {
@@ -37,20 +37,15 @@ func main() {
 	ans.Mul(ans, ans)
 	ans.Mul(ans, big.NewInt(24))
 
-	trashL := omega + 1
-	trashOdd := trashL%2 == 1
-	trashcan := func(i, x int64) bool {
-		return x*x < i*omega-i*i
-	}
+	aLength := omega + 1
+	aOdd := aLength%2 == 1
+	a := func(i, x int64) bool { return x*x < i*omega-i*i }
+	ans.Add(ans, accum((aLength+1)/2-1, aOdd, a))
 
-	hipL := omega - 1 + 1
-	hOdd := hipL%2 == 1
-	hippo := func(i, x int64) bool {
-		return (2*x-1)*(2*x-1) < 2*omega*(2*i+1)-(2*i+1)*(2*i+1)
-	}
-
-	accum(0, (trashL+1)/2-1, ans, trashOdd, trashcan)
-	accum(0, (hipL+1)/2-1, ans, hOdd, hippo)
+	bLength := omega
+	bOdd := bLength%2 == 1
+	b := func(i, x int64) bool { return 2*x*x-2*x+1 < -2*i-2*i*i+omega+2*i*omega }
+	ans.Add(ans, accum((bLength+1)/2-1, bOdd, b))
 
 	fmt.Printf("%s\n", ans.String())
 
