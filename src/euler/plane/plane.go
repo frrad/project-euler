@@ -1,6 +1,5 @@
-package euler
-
 //Plane geometry support for Project Euler
+package plane
 
 import (
 	"errors"
