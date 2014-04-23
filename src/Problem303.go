@@ -21,11 +21,9 @@ func check(n uint64) bool {
 func first(a uint64) uint64 {
 	i := uint64(1)
 	for ; !check(i * a); i++ {
-
 	}
 
 	return i
-
 }
 
 func main() {
@@ -34,9 +32,9 @@ func main() {
 	sum := uint64(0)
 
 	for i := uint64(1); i <= top; i++ {
-		sum += first(i)
-
-		fmt.Println(i)
+		multiple := first(i)
+		sum += multiple
+		fmt.Printf("i:%-5d multiple:%-15d total:%d\n", i, multiple, sum)
 	}
 
 	fmt.Println(sum)
