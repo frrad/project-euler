@@ -43,18 +43,23 @@ func ZRLInit() {
 	}
 }
 
+func rng(a, b int) int {
+	total := 0
+	for i := 1; i <= b; i++ {
+
+		total += zRepLength(i)
+	}
+	return total
+}
+
 func main() {
 	starttime := time.Now()
 
 	ZRLInit()
 
-	total := 0
-	for i := 1; i < 1000000; i++ {
-		//fmt.Printf("%d %d\n", i, zRepLength(i))
-		total += zRepLength(i)
+	for i := 2; i < 25; i++ {
+		fmt.Printf("%d-%-5d\t%d\n", 1, euler.Fibonacci(i), rng(1, int(euler.Fibonacci(i))))
 	}
-
-	fmt.Printf("%d\n", total)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
