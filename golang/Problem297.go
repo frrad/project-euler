@@ -6,60 +6,37 @@ import (
 	"time"
 )
 
-func zRep(n int) []int {
-	var i int
+const top = 100000000000000000
+
+//returns the largest Fibonacci number <= n
+func floor(n int) (i int) {
 	for i = 1; euler.Fibonacci(i) <= int64(n); i++ {
 	}
-
-	end := int(euler.Fibonacci(i - 1))
-	if end == n {
-		return []int{end}
-	}
-
-	return append(zRep(n-end), end)
+	return int(euler.Fibonacci(i - 1))
 }
 
-var zrlmemo = make(map[int]int)
+var memo = map[int]int{0: 0}
 
-func zRepLength(n int) int {
-	if ans, ok := zrlmemo[n]; ok {
+func interval(x int) int {
+	if ans, ok := memo[x]; ok {
 		return ans
 	}
 
-	var i int
-	for i = 1; euler.Fibonacci(i) <= int64(n); i++ {
+	recurse := floor(x)
+	remainder := x - recurse
+
+	if remainder == 0 {
+		memo[x] = 1 + interval(x-1)
+		return interval(x)
 	}
 
-	end := int(euler.Fibonacci(i - 1))
-	ans := 1 + zRepLength(n-end)
-	zrlmemo[n] = ans
-
-	return zRepLength(n)
-}
-
-func ZRLInit() {
-	for i := 0; i < 31; i++ {
-		zrlmemo[int(euler.Fibonacci(i))] = 1
-	}
-}
-
-func rng(a, b int) int {
-	total := 0
-	for i := 1; i <= b; i++ {
-
-		total += zRepLength(i)
-	}
-	return total
+	return interval(recurse) + interval(remainder) + remainder
 }
 
 func main() {
 	starttime := time.Now()
 
-	ZRLInit()
-
-	for i := 2; i < 25; i++ {
-		fmt.Printf("%d-%-5d\t%d\n", 1, euler.Fibonacci(i), rng(1, int(euler.Fibonacci(i))))
-	}
+	fmt.Println(interval(top - 1))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
