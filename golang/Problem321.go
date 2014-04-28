@@ -12,6 +12,8 @@ func moves(i int) int64 {
 	return int64(i*i + 2*i)
 }
 
+//Note: closed form Diophantine equation approach implemented in
+//Mathematica. This isn't fast enough.
 func main() {
 	starttime := time.Now()
 
