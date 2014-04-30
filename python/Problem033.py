@@ -18,7 +18,6 @@ def check((n,d)):
 
     return n*newD == d*newN
 
-fracs = [(n, d) for n in range(10,100) for d in range(n,100) if n != d]
-fracs = filter(check, fracs)
+fracs = ((n, d) for n in range(10,100) for d in range(n,100) if check((n,d)))
 product = reduce(lambda (a,b), (c,d) : (a*c, b*d), fracs)
 print product[1] / euler.GCD(product[0], product[1])
