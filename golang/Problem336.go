@@ -1,7 +1,6 @@
 package main
 
 import (
-	//	"euler"
 	"fmt"
 	"sort"
 	"time"
@@ -12,6 +11,7 @@ const (
 	which = 2011
 )
 
+//this is a wrapper function for sorting
 type trains struct {
 	contents [][]int
 }
