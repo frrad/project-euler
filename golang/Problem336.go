@@ -1,15 +1,33 @@
 package main
 
 import (
-	"euler"
+	//	"euler"
 	"fmt"
+	"sort"
 	"time"
 )
 
 const (
-	top   = 6
-	snack = 9
+	top   = 11
+	which = 2011
 )
+
+type trains struct {
+	contents [][]int
+}
+
+func (t trains) Len() int      { return len(t.contents) }
+func (t trains) Swap(i, j int) { t.contents[i], t.contents[j] = t.contents[j], t.contents[i] }
+func (t trains) Less(i, j int) bool {
+	for a := 0; a < len(t.contents[i]); a++ {
+		if t.contents[i][a] > t.contents[j][a] {
+			return false
+		} else if t.contents[i][a] < t.contents[j][a] {
+			return true
+		}
+	}
+	return true
+}
 
 func reverse(list []int) {
 	lth := len(list)
@@ -18,29 +36,9 @@ func reverse(list []int) {
 	}
 }
 
-//move n to the front. how many moves does this take?
-func front(n int, list []int) (moves int) {
-	if list[0] == n {
-		return 0
-	}
-
-	if list[len(list)-1] == n {
-		reverse(list)
-		return 1
-	}
-
-	i := 0
-	for ; list[i] != n; i++ {
-	}
-
-	reverse(list[i:])
-
-	return 1 + front(n, list)
-}
-
-func sort(list []int) (total int) {
-	for i := 0; i < len(list); i++ {
-		total += front(i, list[i:])
+func letter(list []int) (ans string) {
+	for _, ch := range list {
+		ans += string(ch + 65)
 	}
 	return
 }
@@ -48,23 +46,38 @@ func sort(list []int) (total int) {
 func main() {
 	starttime := time.Now()
 
-	template := make([]int, top)
-	for i := 0; i < top; i++ {
-		template[i] = i
-	}
+	begin := [][]int{[]int{3, 0, 2, 1}, []int{3, 1, 0, 2}}
+	var next [][]int
 
-	for i := 0; i < int(euler.Factorial(top)); i++ {
-		test := make([]int, top)
-		copy(test, template)
+	for k := 4; k < top; k++ {
 
-		test = euler.Permutation(i, test)
+		next = make([][]int, 0)
 
-		if sort(test) == snack {
-			copy(test, template)
-			fmt.Println(euler.Permutation(i, test), snack)
+		for _, old := range begin {
+			temp := make([]int, len(old)+1)
+			copy(temp, old)
+			for i := 0; i < len(old); i++ {
+				temp[i]++
+			}
+			reverse(temp[:len(temp)-1])
+
+			for i := 1; i < len(old); i++ {
+				mod := make([]int, len(temp))
+				copy(mod, temp)
+				reverse(mod[i:])
+
+				next = append(next, mod)
+			}
+
 		}
 
+		begin = next
+
 	}
+
+	sort.Sort(trains{next})
+
+	fmt.Println(letter(next[which-1]))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
