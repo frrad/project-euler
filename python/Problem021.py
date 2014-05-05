@@ -1,14 +1,6 @@
 import euler
 
-def d(n):
-    return euler.divisorSigma(n,1)-n
+def d(n): return euler.divisorSigma(n,1)-n
+def amicableQ(a): return d(a)!=a and d(d(a)) == a
 
-def amicableQ(a):
-    b = d(a)
-    if b==a:
-        return False
-    if d(b) == a:
-        return True
-    return False
-
-print sum([n for n in range(2,10000) if amicableQ(n)])
+print sum((n for n in xrange(2,10000) if amicableQ(n)))
