@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-//Use Hungarian algorithm to minimize  - A 
+//Use Hungarian algorithm to minimize  - A
 
 func print(an [][]int) {
 	fmt.Println("")

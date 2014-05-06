@@ -271,7 +271,7 @@ func (puz *puzzle) isBroken() bool {
 
 }
 
-//finds a good guess 
+//finds a good guess
 func (puz *puzzle) guess() func() (int, int, int) {
 	winning := 9
 	righti, rightj := 0, 0

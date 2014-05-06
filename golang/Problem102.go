@@ -36,7 +36,6 @@ func main() {
 	data := euler.Import("../problemdata/triangles.txt")
 	total := 0
 
-
 	for _, line := range data {
 
 		split := strings.Split(line, ",")

@@ -147,7 +147,7 @@ func wins(hand1, hand2 []card) bool {
 	if (hasflush(hand1) && hasStraight(hand1) != 0) ||
 		(hasflush(hand2) && hasStraight(hand2) != 0) {
 		fmt.Println("Straight flush, what do?!", hand1, hand2)
-		//This case isn't in the file, so I didn't bother 
+		//This case isn't in the file, so I didn't bother
 	}
 
 	a, b := has2pair(hand1)
@@ -206,7 +206,7 @@ func wins(hand1, hand2 []card) bool {
 	c, d = has2pair(hand2)
 
 	//Two pair
-	if a+b+c+d != 0 { //someone has two pair 
+	if a+b+c+d != 0 { //someone has two pair
 
 		if a != 0 && c == 0 {
 			return true

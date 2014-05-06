@@ -9,7 +9,7 @@ import (
 
 const zero = .001
 
-//returns new list 
+//returns new list
 func apply(list []float64, place int, operation int) []float64 {
 	answer := make([]float64, len(list)-1)
 	copy(answer[:place], list[:place])

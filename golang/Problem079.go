@@ -1,7 +1,7 @@
 package main
 
 import (
-	"./eulerlib"
+	"euler"
 	"fmt"
 	"math/rand"
 	"time"
