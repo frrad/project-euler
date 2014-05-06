@@ -47,7 +47,7 @@ func main() {
 			z := x + c2
 
 			if x+x+z < min && euler.IsSquare(x+z) { //x+x+z < x+y+z < min
-				for a2, _ := range poss {
+				for a2 := range poss {
 					y := x + a2
 					if x+y+z < min && euler.IsSquare(x+y) && euler.IsSquare(z+y) {
 

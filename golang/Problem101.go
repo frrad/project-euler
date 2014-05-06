@@ -31,7 +31,7 @@ func f(n float64) float64 {
 func main() {
 	starttime := time.Now()
 
-	pts := [][2]float64{[2]float64{1, f(1)}}
+	pts := [][2]float64{{1, f(1)}}
 
 	answer := float64(0)
 

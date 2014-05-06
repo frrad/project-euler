@@ -96,7 +96,7 @@ func main() {
 			maxCOM := infinity
 			dual := order - blocks - int(balance)
 			if blocks > dual {
-				for key, _ := range trackMemo {
+				for key := range trackMemo {
 					if key[0] == int(balance) && key[1] == dual {
 						COM := key[2]
 						if COM < minCOM {
@@ -109,7 +109,7 @@ func main() {
 				}
 			}
 
-			seq := [][][]int{[][]int{[]int{1<<balance - 1}}}
+			seq := [][][]int{{{1<<balance - 1}}}
 
 			for depth := 2; depth < 4 || len(seq[depth-3]) != len(seq[depth-2]); depth++ {
 				seq = append(seq, [][]int{})

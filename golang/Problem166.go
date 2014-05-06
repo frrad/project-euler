@@ -102,7 +102,7 @@ func count(state [dim][dim]int) (ways int64) {
 
 	//given an unknown coordinate, what are its min / max?
 
-	for opt, _ := range options {
+	for opt := range options {
 		x, y := opt[0], opt[1]
 		below, above := 0, 9
 
@@ -201,10 +201,10 @@ func main() {
 	starttime := time.Now()
 
 	test := [dim][dim]int{
-		[dim]int{-1, -1, -1, -1},
-		[dim]int{-1, -1, -1, -1},
-		[dim]int{-1, -1, -1, -1},
-		[dim]int{-1, -1, -1, -1},
+		{-1, -1, -1, -1},
+		{-1, -1, -1, -1},
+		{-1, -1, -1, -1},
+		{-1, -1, -1, -1},
 	}
 
 	fmt.Println(count(test))

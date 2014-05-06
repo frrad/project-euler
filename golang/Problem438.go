@@ -43,7 +43,7 @@ func main() {
 	tocheck[start] = true
 
 	for len(tocheck) > 0 {
-		for key, _ := range tocheck {
+		for key := range tocheck {
 
 			for a := int64(-1 * sweep); a <= 1*sweep; a++ {
 
@@ -88,7 +88,7 @@ func main() {
 
 	toto := int64(0)
 
-	for key, _ := range work {
+	for key := range work {
 		for i := 0; i < dim; i++ {
 			toto += abs(key[i])
 		}

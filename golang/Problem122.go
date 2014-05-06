@@ -41,7 +41,7 @@ func main() {
 
 					}
 					haveseen[consider] = true
-					temp = append([]*tree{&tree{leaf, consider}}, temp...)
+					temp = append([]*tree{{leaf, consider}}, temp...)
 				}
 				ancestor = ancestor.parent
 			}

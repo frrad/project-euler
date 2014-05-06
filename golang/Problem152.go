@@ -13,7 +13,7 @@ func rep(x int64) [][]int64 {
 	d1 := euler.IntExp(facs[0][0], facs[0][1])
 
 	if len(facs) == 1 {
-		return [][]int64{[]int64{1, d1}}
+		return [][]int64{{1, d1}}
 	}
 
 	d2 := (x) / d1

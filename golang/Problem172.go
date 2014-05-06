@@ -17,7 +17,7 @@ func ways(n, goal, most int) [][]int {
 	}
 
 	if n == 1 {
-		return [][]int{[]int{goal}}
+		return [][]int{{goal}}
 	}
 
 	accumulate := make([][]int, 0)
@@ -41,7 +41,7 @@ func paint(color int, topaint [][]int) [][]int {
 
 //returns compressed representation of slice
 func compress(input []int) [][2]int {
-	ans := [][2]int{[2]int{input[0], 1}}
+	ans := [][2]int{{input[0], 1}}
 	pointer := 0
 	for i := 1; i < len(input); i++ {
 		if ans[pointer][0] == input[i] {

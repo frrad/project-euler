@@ -115,7 +115,7 @@ func main() {
 				newt := make([]int, 2*fLength)
 				copy(newt[:fLength+1], convergentList)
 				copy(newt[fLength+1:(2*fLength)], convergentList[1:fLength])
-				x, _ = ctdFrac(newt[:len(newt)])
+				x, _ = ctdFrac(newt[:])
 
 			}
 

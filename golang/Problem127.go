@@ -11,7 +11,7 @@ var table map[int64]map[int64]bool
 var rable map[int64]int64
 
 func coprime(a, b int64) bool {
-	for prime, _ := range sig(a) {
+	for prime := range sig(a) {
 		if sig(b)[prime] {
 			return false
 		}
@@ -50,13 +50,13 @@ func rad(a, b, c int64) (r int64) {
 	}
 
 	r = 1
-	for prime, _ := range sig(a) {
+	for prime := range sig(a) {
 		r *= prime
 	}
-	for prime, _ := range sig(b) {
+	for prime := range sig(b) {
 		r *= prime
 	}
-	for prime, _ := range sig(c) {
+	for prime := range sig(c) {
 		r *= prime
 	}
 

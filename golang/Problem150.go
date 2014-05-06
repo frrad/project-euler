@@ -96,14 +96,14 @@ func main() {
 			}
 		}
 
-		for key, _ := range triMem {
+		for key := range triMem {
 			d := key[2]
 			if d < depth-1 {
 				delete(triMem, key)
 			}
 		}
 
-		for key, _ := range rowMem {
+		for key := range rowMem {
 			d := key[2]
 			if d < depth-1 {
 				delete(rowMem, key)

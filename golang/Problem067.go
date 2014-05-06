@@ -27,7 +27,7 @@ func main() {
 	}
 
 	for j := len(triangle) - 2; j >= 0; j-- {
-		for i, _ := range triangle[j] {
+		for i := range triangle[j] {
 			max := triangle[j+1][i]
 			if triangle[j+1][i+1] > max {
 				max = triangle[j+1][i+1]

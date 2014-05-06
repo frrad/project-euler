@@ -46,7 +46,7 @@ func letter(list []int) (ans string) {
 func main() {
 	starttime := time.Now()
 
-	begin := [][]int{[]int{3, 0, 2, 1}, []int{3, 1, 0, 2}}
+	begin := [][]int{{3, 0, 2, 1}, {3, 1, 0, 2}}
 	var next [][]int
 
 	for k := 4; k < top; k++ {

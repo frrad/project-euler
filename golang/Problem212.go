@@ -131,13 +131,13 @@ func size(collection []int) int64 {
 	}
 
 	xlist, ylist, zlist := make([]int, 0), make([]int, 0), make([]int, 0)
-	for key, _ := range xpts {
+	for key := range xpts {
 		xlist = append(xlist, key)
 	}
-	for key, _ := range ypts {
+	for key := range ypts {
 		ylist = append(ylist, key)
 	}
-	for key, _ := range zpts {
+	for key := range zpts {
 		zlist = append(zlist, key)
 	}
 
