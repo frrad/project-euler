@@ -30,10 +30,13 @@ func nth(n int64) bool {
 		return false
 	}
 
+	//first double until we get an upper bound
 	k := int64(1)
 	for smart(k) < n {
 		k *= 2
 	}
+
+	//now binary search
 	a, b := int64(1), k
 	for b-a > 1 {
 
@@ -49,7 +52,6 @@ func nth(n int64) bool {
 	}
 
 	return smart(a) == n || smart(b) == n
-
 }
 
 func smart(i int64) int64 {
