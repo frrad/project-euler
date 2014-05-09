@@ -8,29 +8,17 @@ import (
 
 const top = 100000000
 
-func inverseModP(n, p int) int {
-	temp, _ := euler.ExtendedEuclidean(int64(n), int64(p))
-	ans := int(temp)
-	for ans > 0 {
-		ans -= p
-	}
-	for ans < 0 {
-		ans += p
-	}
-	return ans
-}
-
 func S(p int) int {
 	ans := p
 
-	first := inverseModP(p-2, p)
+	first := int(euler.InverseMod(int64(p-2), int64(p)))
 	ans += first
 
-	delta := inverseModP(p-3, p)
+	delta := int(euler.InverseMod(int64(p-3), int64(p)))
 	first = (first * delta) % p
 	ans += first
 
-	delta = inverseModP(p-4, p)
+	delta = int(euler.InverseMod(int64(p-4), int64(p)))
 	first = (first * delta) % p
 
 	ans += first
