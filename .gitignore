@@ -23,11 +23,6 @@ _testmain.go
 
 # Gedit temporary files
 *~
-eulerdata/status.html
-eulerdata/settings.dat
-eulerdata/known.txt
-eulerdata/captcha/*.png
-
 haskell/*.hi
 
 # compiled python
