@@ -2,124 +2,184 @@ package main
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 )
 
-//Use Hungarian algorithm to minimize  - A
+func kill(input [][]int, I, J int) ([][]int, int) {
+	ans := input[I][J]
 
-func print(an [][]int) {
-	fmt.Println("")
-	for i := 0; i < len(an); i++ {
-		for _, p := range an[i] {
-			fmt.Print(p, "\t")
-		}
-		fmt.Print("\n")
+	for i := I; i < len(input)-1; i++ {
+		copy(input[i], input[i+1])
 	}
+
+	for i := 0; i < len(input); i++ {
+		copy(input[i][J:len(input)-1], input[i][J+1:])
+		input[i] = input[i][:len(input)-1]
+	}
+
+	return input[:len(input)-1], ans
 }
 
-func reverse(a [][]int) {
-	for _, row := range a {
-		for i := range row {
-			row[i] = -row[i]
+func cans(input [][]int) [][2]int {
+	ans := make([][2]int, 0)
+
+	for i := 0; i < len(input); i++ {
+		max, maxj := -1, -1
+		for j := 0; j < len(input); j++ {
+			if input[i][j] > max {
+				max, maxj = input[i][j], j
+			}
 		}
+
+		ans = append(ans, [2]int{i, maxj})
 	}
+
+	for i := 0; i < len(input); i++ {
+		max, maxj := -1, -1
+		for j := 0; j < len(input); j++ {
+			if input[j][i] > max {
+				max, maxj = input[j][i], j
+			}
+		}
+
+		ans = append(ans, [2]int{maxj, i})
+	}
+
+	ans = dedupe(ans)
+
+	return ans
 }
 
-func max(A [][]int) int {
-	mix := A[0][0]
-	for _, row := range A {
-		for i := range row {
-			if row[i] > mix {
-				mix = row[i]
+func dedupe(input [][2]int) [][2]int {
+	for i := 0; i < len(input); i++ {
+		for j := i + 1; j < len(input); j++ {
+			if input[i] == input[j] {
+				copy(input[i:len(input)-1], input[i+1:])
+				input = input[:len(input)-1]
+				i--
+				break
 			}
 		}
 	}
-	return mix
+
+	return input
 }
 
-func matAdd(A [][]int, alpha int) {
-	for _, row := range A {
-		for i := range row {
-			row[i] = alpha + row[i]
+func trivial(couldBe [][2]int) [][2]int {
+	ans := make([][2]int, 0)
+
+	for _, can := range couldBe {
+		i, j := can[0], can[1]
+		x := 0
+		for _, can2 := range couldBe {
+			if can2[0] == i {
+				x++
+			}
+			if can2[1] == j {
+				x++
+			}
+		}
+		if x == 2 {
+			ans = append(ans, can)
 		}
 	}
+	return ans
 }
 
-func rowMin(A [][]int, i int) int {
-	row := A[i]
-	min := row[0]
-	for _, fig := range row {
-		if fig < min {
-			min = fig
-		}
-	}
-	return min
-}
+func trivialize(A [][]int) ([][]int, int) {
+	total := 0
 
-func rowAdd(A [][]int, i int, alpha int) {
-	row := A[i]
-	for j := range row {
-		row[j] += alpha
-	}
-}
-
-func transpose(A [][]int) {
 	for i := 0; i < len(A); i++ {
-		for j := i; j < len(A); j++ {
-			A[i][j], A[j][i] = A[j][i], A[i][j]
-		}
-	}
-}
 
-func minor(A [][]int, a, b int) {
-	A = append(A[:a], A[a+1:]...)
-	for _, row := range A {
+		couldBe := cans(A)
+		crunch := trivial(couldBe)
 
-		row = append(row[:b], row[b+1:]...)
-	}
-
-}
-
-func reduce(A [][]int) [][]int {
-
-	lid := len(A)
-
-	for x := 0; x < len(A); x++ {
-
-		for i := 0; i < lid; i++ {
-			for j := 0; j < lid && i < lid; j++ {
-				//	fmt.Println(i, j, lid)
-				//	print(A)
-				if A[i][j] == 0 {
-					minor(A, i, j)
-					lid--
-				}
-			}
-
+		if len(crunch) != 0 {
+			temp := 0
+			i, j := crunch[0][0], crunch[0][1]
+			A, temp = kill(A, i, j)
+			total += temp
 		}
 
 	}
 
-	B := make([][]int, lid)
-	for i := 0; i < lid; i++ {
-		B[i] = make([]int, lid)
-		copy(B[i], A[i][:lid])
+	return A, total
+}
+
+func clone(A [][]int) [][]int {
+	size := len(A)
+	B := make([][]int, size)
+	for i := 0; i < size; i++ {
+		B[i] = make([]int, size)
+		copy(B[i], A[i])
 	}
 	return B
-
 }
+
+func keyFun(A [][]int) string {
+	key := ""
+	for i := 0; i < len(A); i++ {
+		for j := 0; j < len(A); j++ {
+			key += strconv.Itoa(A[i][j])
+			key += " "
+		}
+	}
+
+	return key
+}
+
+var table = make(map[string]int)
+
+func BFS(A [][]int) int {
+	if len(A) == 0 {
+		return 0
+	}
+
+	key := keyFun(A)
+
+	if ans, ok := table[key]; ok {
+		return ans
+	}
+
+	total := 0
+	A, total = trivialize(A)
+
+	best := -1
+	for i := 0; i < len(A); i++ {
+		B := clone(A)
+		maxj, val := -1, -1
+		for j := 0; j < len(A); j++ {
+			if A[i][j] > val {
+				val, maxj = A[i][j], j
+			}
+		}
+
+		delta := 0
+		B, delta = kill(B, i, maxj)
+		downsize := delta + BFS(B)
+		if downsize > best {
+			best = downsize
+		}
+
+	}
+
+	table[key] = total + best
+	return total + best
+}
+
 func main() {
 	starttime := time.Now()
 
-	var A = [][]int{
+	/*var A = [][]int{
 		{7, 53, 183, 439, 863},
 		{497, 383, 563, 79, 973},
 		{287, 63, 343, 169, 583},
 		{627, 343, 773, 959, 943},
 		{767, 473, 103, 699, 303},
-	}
+	}*/
 
-	/*	var Aaaaa = [][]int{
+	var A = [][]int{
 		[]int{7, 53, 183, 439, 863, 497, 383, 563, 79, 973, 287, 63, 343, 169, 583},
 		[]int{627, 343, 773, 959, 943, 767, 473, 103, 699, 303, 957, 703, 583, 639, 913},
 		[]int{447, 283, 463, 29, 23, 487, 463, 993, 119, 883, 327, 493, 423, 159, 743},
@@ -135,33 +195,9 @@ func main() {
 		[]int{34, 124, 4, 878, 450, 476, 712, 914, 838, 669, 875, 299, 823, 329, 699},
 		[]int{815, 559, 813, 459, 522, 788, 168, 586, 966, 232, 308, 833, 251, 631, 107},
 		[]int{813, 883, 451, 509, 615, 77, 281, 613, 459, 205, 380, 274, 302, 35, 805},
-	}*/
-
-	max := max(A)
-	reverse(A)
-	matAdd(A, max)
-	print(A)
-
-	pay := 0
-	for i := 0; i < len(A); i++ {
-		twit := rowMin(A, i)
-		pay += twit
-		rowAdd(A, i, -twit)
 	}
 
-	print(A)
-
-	transpose(A)
-	for i := 0; i < len(A); i++ {
-		twit := rowMin(A, i)
-		pay += twit
-		rowAdd(A, i, -twit)
-	}
-
-	transpose(A)
-	print(A)
-
-	fmt.Println(len(A)*max - pay)
+	fmt.Println(BFS(A))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
