@@ -157,6 +157,10 @@ def factorial(n):
 def triangle(n):
     return n*(n+1)/2
 
+def pentagon(n):
+    return n* (3*n -1) /2
+
+
 ##############
 ###ANALYSIS###
 ##############
