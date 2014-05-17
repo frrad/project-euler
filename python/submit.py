@@ -1,15 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python2
 
 #Submitter tool. For now only offline. Checks against database of correct answers.
 
 
 import sys, subprocess, time
 
-answerPath = '''../eulerdata/known.txt'''
+answerPath = '''/home/frederick/.euler-tools/known.txt'''
 infinity = 9999999999
 
 def command(problem):
-    return ['python', 'Problem%03d.py'%problem]
+    return ['python2', 'Problem%03d.py'%problem]
 
 def validate(lookup, q, a):
     if not q in lookup:
