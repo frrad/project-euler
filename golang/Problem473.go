@@ -36,8 +36,7 @@ func sum(i int64) (ans int64) {
 	n := 0
 	for i > 0 {
 		if i&1 == 1 {
-			ans += 4 * lucas(2+2*n)
-			ans += 2 * lucas(1+2*n)
+			ans += 2 * lucas(4+2*n)
 		}
 		n++
 		i /= 2
