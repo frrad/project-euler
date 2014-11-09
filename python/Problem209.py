@@ -20,20 +20,16 @@ def nextSet(n):
     return unary(relate(binary(n)))
 
 def colorings(n):
-
-
     a = 0
     b = 1
     for i in xrange(n-1):
         a, b = a + b, a
     ans = a
 
-
     a = 1
     b = 0
     for i in xrange(n-1):
         a, b = a + b, a
-
 
     return ans + a + b
 
@@ -53,4 +49,3 @@ def cycles():
     return cycles
 
 print reduce(lambda a,b: a*b, map( colorings, cycles() ))
-
