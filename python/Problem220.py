@@ -91,16 +91,25 @@ def magicWrap(k, n):
     if k%modder == 0:
         return(a,b)
     if k%modder == 1:
-#        if n%2 ==0:
-        return (a/2 + b/2,-a/2 + b/2)
-
+        if n%2 ==0:
+            return (a/2 + b/2,-a/2 + b/2)
+        if n%2 == 1:
+            return ((a+b)/2,b/2 - a/2)
     if k%modder == 2:
-        return (-b,a)
+        return (b,-a)
     if k%modder == 3:
-        return (a/2-b/2,a/2+b/2)
+        return ((-a+ b)/2,(-a - b)/2)
+    if k%modder == 4:
+        return (-a,-b)
+    if k%modder == 5:
+        return ((-a-b)/2,(a-b)/2)
+    if k%modder == 6:
+        return (-b,a)
+    if k%modder == 7:
+        return ((a-b)/2,(a+b)/2)
         
 
-    return (0,0)
+    return None
 
 def sketch(alist):
     a = reduce(min, (i[0] for i in alist))
@@ -112,8 +121,7 @@ def sketch(alist):
     for i in range(a,b+1):
         print "".join(["X" if (i,j) in alist else " " for j in range(c, d+1)])
 
-k = 17
-print 'k=', k
+
 
 # fold  = [dumb(k,i)      for i in range(1,1 + 2**k)]  
 # foool = [magicWrap(k,i) for i in range(1 + 2**k)]  
@@ -125,10 +133,13 @@ print 'k=', k
 
 
 scoop = 0.
-scope = 40.
-for i in range(40):
-    if magicWrap(k,i) != dumb(k,i):
-        print "%7s:%7s:%7s (%d)" % (dumb(k,i), magic(k,i), magicWrap(k,i),i)
-        scoop += 1
-        
-print scoop/scope*100
+scope = 30
+
+for k in range(15):
+    for i in range(scope):
+        if magicWrap(k,i) != dumb(k,i):
+            print "%2d|%8s<-%8s   %8s" % (i,dumb(k,i), magic(k,i), magicWrap(k,i))
+        else:
+            scoop += 1
+
+    print scoop/float(scope)*100,"% correct"
