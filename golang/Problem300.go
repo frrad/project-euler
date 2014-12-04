@@ -6,9 +6,12 @@ import (
 )
 
 const top = 15
+const max_trinary = 1594323
 
-// Given a folding configuration (trinary number) return a slice of bitmasks to
-// compute the score of a binary number in this folding.
+var around = [4][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
+
+// Given a folding configuration (trinary number) return a slice of bitmasks
+// to compute the score of a binary number in this folding.
 func masks(arranged int) []int {
 	var positions [15][2]int
 
@@ -32,8 +35,7 @@ func masks(arranged int) []int {
 		positions[i][1] = positions[i-1][1] + aim[1]
 	}
 
-	//	fmt.Println(positions)
-
+	// Build reverse lookup table
 	reverse_lookup := make(map[[2]int]int)
 	for i, tuple := range positions {
 		if _, ok := reverse_lookup[tuple]; !ok {
@@ -42,23 +44,44 @@ func masks(arranged int) []int {
 			return nil
 		}
 	}
-	return []int{234}
+
+	ans := make([]int, 0)
+	for i, current := range positions {
+		for _, faddle := range around {
+			aim[0], aim[1] = faddle[0]+current[0], faddle[1]+current[1]
+
+			if val, ok := reverse_lookup[aim]; ok {
+				if val > i {
+					ans = append(ans, 1<<uint(i)|1<<uint(val))
+				}
+			}
+		}
+	}
+
+	return ans
 }
 
 func main() {
 	starttime := time.Now()
 
-	a, b := 0, 0
+	opt := make(map[int]int)
 
-	for i := 0; i < 1594323; i++ {
-		if len(masks(i)) == 0 {
-			a++
-		} else {
-			b++
+	for pattern := 0; pattern < max_trinary; pattern++ {
+		pattern_masks := masks(pattern)
+		for protein := 0; protein < 1<<top; protein++ {
+			score := 0
+			for mask := range pattern_masks {
+				if mask&protein == mask {
+					score++
+				}
+			}
+			if score > opt[protein] {
+				opt[protein] = score
+			}
 		}
-	}
 
-	fmt.Println(a, b)
+		fmt.Println(100 * pattern / max_trinary)
+	}
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
