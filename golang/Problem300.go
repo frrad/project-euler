@@ -6,7 +6,7 @@ import (
 )
 
 const top = 15
-const max_trinary = 1594323
+const max_trinary = 1594323 // 3^(top-2)
 
 var around = [4][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
 
@@ -50,10 +50,8 @@ func masks(arranged int) []int {
 		for _, faddle := range around {
 			aim[0], aim[1] = faddle[0]+current[0], faddle[1]+current[1]
 
-			if val, ok := reverse_lookup[aim]; ok {
-				if val > i {
-					ans = append(ans, 1<<uint(i)|1<<uint(val))
-				}
+			if val, ok := reverse_lookup[aim]; ok && val > i {
+				ans = append(ans, 1<<uint(i)|1<<uint(val))
 			}
 		}
 	}
@@ -61,27 +59,49 @@ func masks(arranged int) []int {
 	return ans
 }
 
+// Given a set of masks, score a protein
+func score(pattern_masks []int, protein int) (score int) {
+	for _, mask := range pattern_masks {
+		if mask&protein == mask {
+			score++
+		}
+	}
+	return
+}
+
 func main() {
 	starttime := time.Now()
 
 	opt := make(map[int]int)
+	configurations := make([][]int, 0)
 
 	for pattern := 0; pattern < max_trinary; pattern++ {
-		pattern_masks := masks(pattern)
-		for protein := 0; protein < 1<<top; protein++ {
-			score := 0
-			for mask := range pattern_masks {
-				if mask&protein == mask {
-					score++
-				}
-			}
-			if score > opt[protein] {
-				opt[protein] = score
-			}
+		if config := masks(pattern); len(config) > 0 {
+			configurations = append(configurations, config)
+		}
+	}
+
+	fmt.Println(len(configurations))
+
+	for _, pattern_masks := range configurations {
+		if len(pattern_masks) == 0 {
+			continue
 		}
 
-		fmt.Println(100 * pattern / max_trinary)
+		for protein := 0; protein < 1<<top; protein++ {
+			if my_score := score(pattern_masks, protein); my_score > opt[protein] {
+				opt[protein] = my_score
+			}
+		}
 	}
+
+	total := 0
+	for _, score := range opt {
+		total += score
+	}
+	fmt.Println(total)
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
+
+
