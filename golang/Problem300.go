@@ -2,6 +2,8 @@ package main
 
 import (
 	"fmt"
+	"sort"
+	"strconv"
 	"time"
 )
 
@@ -13,7 +15,7 @@ var around = [4][2]int{{1, 0}, {-1, 0}, {0, 1}, {0, -1}}
 // Given a folding configuration (trinary number) return a slice of bitmasks
 // to compute the score of a binary number in this folding.
 func masks(arranged int) []int {
-	var positions [15][2]int
+	var positions [top][2]int
 
 	positions[0] = [2]int{0, 0}
 	positions[1] = [2]int{1, 0}
@@ -69,15 +71,29 @@ func score(pattern_masks []int, protein int) (score int) {
 	return
 }
 
+func makeKey(input []int) (ans string) {
+	for _, num := range input {
+		ans += strconv.Itoa(num)
+		ans += "|"
+	}
+	return
+}
+
 func main() {
 	starttime := time.Now()
 
 	opt := make(map[int]int)
 	configurations := make([][]int, 0)
 
+	seen := make(map[string]bool)
+
 	for pattern := 0; pattern < max_trinary; pattern++ {
 		if config := masks(pattern); len(config) > 0 {
-			configurations = append(configurations, config)
+			sort.Ints(config)
+			if key := makeKey(config); !seen[key] {
+				seen[key] = true
+				configurations = append(configurations, config)
+			}
 		}
 	}
 
@@ -99,9 +115,7 @@ func main() {
 	for _, score := range opt {
 		total += score
 	}
-	fmt.Println(total)
+	fmt.Println(total, float64(total)/(1<<top))
 
 	fmt.Println("Elapsed time:", time.Since(starttime))
 }
-
-
