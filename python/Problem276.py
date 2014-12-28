@@ -1,27 +1,6 @@
-from euler import primeQ as primeQ
-
 # Number of triangles
-
-
 def Triangle(n):
-    return ((n * n / 6) + 1) / 2
-
-
-# Number of primitive triangles
-def Primitive(n):
-    if primeQ(n):
-        return Triangle(n)
-
-    ans = 0
-    for i in xrange(2, n):
-        if n % i == 0:
-            ans += Primitive(i)
-
-    return Triangle(n) - ans
-
-
-def brute(n):
-    return sum((Primitive(i) for i in xrange(2, n)))
+    return ((n * n / 6) + 1) / 2 - (n / 4) * ((n + 2) / 4)
 
 
 def seive(top):
@@ -32,7 +11,7 @@ def seive(top):
     for n in xrange(2, top):
         # if prime
         if seive_data[n] == 0:
-            print n
+
             seive_data[n] = Triangle(n)
         else:
             seive_data[n] = Triangle(n) - seive_data[n]
@@ -48,6 +27,4 @@ def seive(top):
     return accumulate
 
 
-print seive(10**7)
-
-
+print seive(1 + 10 ** 7)
