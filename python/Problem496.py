@@ -40,11 +40,11 @@ def smartplore(b):
     else:
         return 0
 
+
 def smartplore2(b, end):
     boiled = steam[b]
 
     start = int(sqrt(b * b + b) + 1)
-
 
     a, b = (int(1 + start / boiled),  int(end / boiled))
     if a <= b:
@@ -81,8 +81,9 @@ def steamer(top):
         x += 1
 
 
-asdf = 10 ** 6
+asdf = 10 ** 9
 steam = list(1 for a in xrange(asdf))
 steamer(asdf)
+print 'steamed'
 
 print EFF(asdf)
