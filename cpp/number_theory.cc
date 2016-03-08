@@ -1,4 +1,6 @@
+#include <vector>
 
+using std::vector;
 
 bool is_prime(int n) {
   if (n <= 1) {
@@ -10,4 +12,18 @@ bool is_prime(int n) {
     }
   }
   return true;
+}
+
+vector<int> primes_below(int n) {
+  vector<int> answer;
+  int x = 2;
+
+  while (x < n) {
+    if (is_prime(x)) {
+      answer.push_back(x);
+    }
+    x++;
+  }
+
+  return answer;
 }
