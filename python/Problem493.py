@@ -1,34 +1,21 @@
 from euler import choose
 
 colors_in_rainbow = 7
-total_balls = 70
+
 balls_to_draw = 20
-balls_per_color = total_balls / colors_in_rainbow
+balls_per_color = 10
+total_balls = balls_per_color * colors_in_rainbow
 
 
-# number of partitions of n into exactly k parts
-def partition(n, k):
-    if n == k and n == 0:
+def only_red_and_orange(n):
+    if n == 2:
         return 1
-    if n <= 0 or k <= 0:
-        return 0
-    return partition(n - k, k) + partition(n - 1, k - 1)
+
+    return choose(n * balls_per_color, balls_to_draw) - sum([choose(n, x) * only_red_and_orange(x) for x in xrange(2, n)])
 
 
-# how many configurations contain n or fewer distinct colors
-def or_fewer(n):
-
-    # which colors to avoid
-    answer = choose(colors_in_rainbow, n)
-
-    # how many such configurations
-    answer *= choose(balls_per_color * n, balls_to_draw)
-
-    return answer
+def only_n_distinct_colors(n):
+    return choose(colors_in_rainbow, n) * only_red_and_orange(n)
 
 
-def exactly(n):
-    return or_fewer(n) - or_fewer(n - 1)
-
-
-print sum((n * exactly(n) for n in xrange(2, colors_in_rainbow + 1))), choose(total_balls, balls_to_draw)
+print float(sum([a * only_n_distinct_colors(a) for a in range(2, 8)])) / choose(total_balls, balls_to_draw)
